@@ -53,8 +53,14 @@ export class Groups implements OnInit {
   selectGroup(group: any) {
     this.selectedGroup = group;
 
+    this.members = [];
+
+    const currentGroupId = group.groupId;
+
     this.formService.getGroupMembers(group.groupId).subscribe({
       next: (res: any) => {
+        if (this.selectedGroup?.groupId !== currentGroupId) return;
+
         console.log('MEMBERS RESPONSE:', res);
         const members = res.members || [];
         console.log('MEMBERS ARRAY:', members);
@@ -286,7 +292,10 @@ export class Groups implements OnInit {
     } else {
       this.selectedGroupDetails = group;
       this.isSidebarOpen = true;
-      this.selectGroup(group);
+      
+      if (this.selectedGroup?.groupId !== group.groupId) {
+        this.selectGroup(group);
+      }
     }
   }
   
