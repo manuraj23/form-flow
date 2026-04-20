@@ -6,11 +6,9 @@ export const authInverseGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const authService = inject(AuthService);
 
-  // 🔥 check from localStorage-backed service
   authService.checkAuthStatus();
-  const isLoggedIn = !!authService.getAccessToken();
-
-  return isLoggedIn
+  
+  return authService.isLoggedIn()
     ? router.createUrlTree(['/home'])
     : true;
 };
