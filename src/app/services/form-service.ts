@@ -17,75 +17,76 @@ export class FormService {
     private themeService: ThemeService,
   ) { }
 
-mapToFormSchema(rawForm: any): Form {
-  return {
-    id: rawForm.id,
-    theme: localStorage.getItem('theme') || 'theme-pink',
-    title: rawForm.title,
-    description: rawForm.description,
-    published: rawForm.pubilshed,
-    settings: {
-    ...rawForm.settings,
-    scoreShow: rawForm.settings?.showScore ?? false
-    },
-    mainParentId: rawForm.mainParentId,
+  mapToFormSchema(rawForm: any): Form {
+    return {
+      id: rawForm.id,
+      theme: localStorage.getItem('theme') || 'theme-pink',
+      title: rawForm.title,
+      description: rawForm.description,
+      published: rawForm.pubilshed,
+      settings: {
+        ...rawForm.settings,
+        scoreShow: rawForm.settings?.showScore ?? false
+      },
+      mainParentId: rawForm.mainParentId,
 
-    sections: rawForm.sections.map((section: any, sectionIndex: number) => ({
-      id: section.id,
-      sectionTitle: section.title,
-      sectionOrder: sectionIndex + 1,
+      sections: rawForm.sections.map((section: any, sectionIndex: number) => ({
+        id: section.id,
+        sectionTitle: section.title,
+        sectionOrder: sectionIndex + 1,
 
-      // ADD MARKS
-      positiveMarks: section.positiveMarks || 0,
-      negativeMarks: section.negativeMarks || 0,
+        // ADD MARKS
+        positiveMarks: section.positiveMarks || 0,
+        negativeMarks: section.negativeMarks || 0,
 
-      fields: section.fields.map((field: any, fieldIndex: number) => {
-        
-        //Extract options as string[]
-        const optionsArray = (field.options || []).map((opt: any) => opt.label);
+        fields: section.fields.map((field: any, fieldIndex: number) => {
 
-        //Find correct answer for MCQ
-        const correctOption = (field.options || []).find((opt: any) => opt.isCorrect);
+          //Extract options as string[]
+          const optionsArray = (field.options || []).map((opt: any) => opt.label);
 
-        return {
-          id: field.id,
-          fieldType: field.type,
-          fieldOrder: fieldIndex + 1,
+          //Find correct answer for MCQ
+          const correctOption = (field.options || []).find((opt: any) => opt.isCorrect);
 
-          fieldConfig: {
-            label: field.label,
+          return {
+            id: field.id,
+            fieldType: field.type,
+            fieldOrder: fieldIndex + 1,
 
-            //convert required properly
-            required: field.validations?.required || false,
+            fieldConfig: {
+              label: field.label,
 
-            //send plain options array
-            options: optionsArray,
+              //convert required properly
+              required: field.validations?.required || false,
 
-            //answer logic
-            answer: field.type === 'TEXT'
-              ? field.correctAnswer || ''
-              : correctOption?.label || '',
+              //send plain options array
+              options: optionsArray,
 
-            placeholder: field.placeholder
-          },
+              //answer logic
+              answer: field.type === 'TEXT'
+                ? field.correctAnswer || ''
+                : correctOption?.label || '',
 
-          fieldStyle: {
-            color: field.color,
-            fontSize: field.fontSize,
-            bold: field.bold,
-            italic: field.italic,
-            underline: field.underline,
-          },
-          fieldLogic: {
-            enabled: field.fieldLogic.enabled,
-            sourceFieldId: field.fieldLogic.sourceFieldId,
-            operator: field.fieldLogic.operator,
-            value: field.fieldLogic.value,
-            action: field.fieldLogic.action
+              placeholder: field.placeholder
+            },
+
+            fieldStyle: {
+              color: field.color,
+              fontSize: field.fontSize,
+              bold: field.bold,
+              italic: field.italic,
+              underline: field.underline,
+            },
+            fieldLogic: {
+              enabled: field.fieldLogic.enabled,
+              sourceFieldId: field.fieldLogic.sourceFieldId,
+              operator: field.fieldLogic.operator,
+              value: field.fieldLogic.value,
+              action: field.fieldLogic.action
+            }
           }
-        })),
+        }),
       })),
-    };
+    }
   }
 
   private mapToFormData(formId: string, rawValue: any): FormData {
@@ -132,17 +133,17 @@ mapToFormSchema(rawForm: any): Form {
     return data;
   }
 
-  getFormById(id: string): Observable<Form>{
-    return this.http.get<Form>(this.url + 'user/form/' + id); 
+  getFormById(id: string): Observable<Form> {
+    return this.http.get<Form>(this.url + 'user/form/' + id);
   }
 
   getResponseFormById(id: string): Observable<Form> {
     return this.http.get<Form>(this.url + 'public/form/' + id);
   }
 
-  generateForm(promptText : string): Observable<any> {
+  generateForm(promptText: string): Observable<any> {
     return this.http.post(this.url + 'user/form/generate', {
-      prompt : promptText
+      prompt: promptText
     });
   }
 
@@ -157,8 +158,8 @@ mapToFormSchema(rawForm: any): Form {
   getAllForms(): Observable<Form[]> {
     return this.http.get<Form[]>(this.url + 'user/allForm');
   }
-  
-  getFormByStatus() {}
+
+  getFormByStatus() { }
 
   submitResponse(formId: string, rawValue: any) {
     const formData = this.mapToFormData(formId, rawValue);
@@ -210,40 +211,40 @@ mapToFormSchema(rawForm: any): Form {
     });
   }
 
-getSharedForms(){
-  return this.http.get(this.url + 'user/shared-forms');
-}
+  getSharedForms() {
+    return this.http.get(this.url + 'user/shared-forms');
+  }
 
 
-// Version Cpntrol APIs
- 
-getAllVersions(formId: string){
-  return this.http.get(this.url + 'user/version/' + formId);
-}
+  // Version Cpntrol APIs
 
-switchVersion(formId: string, versionId: number) {
-  const url = `${this.url}user/version/switch/${formId}`;
+  getAllVersions(formId: string) {
+    return this.http.get(this.url + 'user/version/' + formId);
+  }
 
-  const body = {
-    versionId: versionId
-  };
+  switchVersion(formId: string, versionId: number) {
+    const url = `${this.url}user/version/switch/${formId}`;
 
-  return this.http.patch(url, body, { responseType: 'text' });
-}
+    const body = {
+      versionId: versionId
+    };
+
+    return this.http.patch(url, body, { responseType: 'text' });
+  }
 
 
-deleteAllVersions(formId: string) {
-  return this.http.patch(
-    `${this.url}user/version/delete/${formId}`,
-    {} , {responseType: 'text'}
-  );
-}
-  createGroup(data : any) {
+  deleteAllVersions(formId: string) {
+    return this.http.patch(
+      `${this.url}user/version/delete/${formId}`,
+      {}, { responseType: 'text' }
+    );
+  }
+  createGroup(data: any) {
     return this.http.post(this.url + 'group/createGroup', data);
   }
 
   getMyGroups() {
-    return this.http.get(this. url + 'group/myGroups');
+    return this.http.get(this.url + 'group/myGroups');
   }
 
 }

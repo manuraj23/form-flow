@@ -4,8 +4,7 @@ export interface FormSettingsSchema {
     isPrivate?: boolean;
     maxResponses?: number;
     closeMessage?: string;
-    isQuiz?: boolean;
+    isQuizMode?: boolean;
     showScore?: boolean;
-    positiveMarks?: number;
-    negativeMarks?: number;
+    defaultPointsPerField?: number;
 }

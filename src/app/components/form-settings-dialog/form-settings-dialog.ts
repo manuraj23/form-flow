@@ -37,7 +37,7 @@ export class FormSettingsDialog {
     @Inject(MAT_DIALOG_DATA) public data: FormSettingsSchema
   ) {
     if (!this.data) {
-      this.data = {deadline: undefined, closeMessage: '', maxResponses: undefined, isPrivate: false};
+      this.data = { deadline: undefined, closeMessage: '', maxResponses: undefined, isPrivate: false, isQuizMode: false };
     }
   }
 
@@ -46,21 +46,14 @@ export class FormSettingsDialog {
   //   this.data.closeMessage = ''; 
   // }
 
-  onQuizToggle() {
-  if (!this.data.isQuiz) {
-    this.data.showScore = false;
-    this.data.positiveMarks = 0;
-    this.data.negativeMarks = 0;
-  }
-}
   onSave() {
     if (this.data.deadline) {
-    const finalDate = new Date(this.data.deadline);
-    finalDate.setHours(23, 59, 59, 999);
-    this.data.deadline = finalDate.toISOString();
-    
-    console.log("Saving deadline as:", this.data.deadline);
-  }
+      const finalDate = new Date(this.data.deadline);
+      finalDate.setHours(23, 59, 59, 999);
+      this.data.deadline = finalDate.toISOString();
+
+      console.log("Saving deadline as:", this.data.deadline);
+    }
     this.dialogRef.close(this.data);
   }
 

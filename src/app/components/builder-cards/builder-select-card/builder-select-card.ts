@@ -4,7 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { BuilderFieldSchema } from '../../../interfaces/builder-field-schema';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
-import {MatIconModule} from '@angular/material/icon';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-builder-select-card',
@@ -13,18 +13,14 @@ import {MatIconModule} from '@angular/material/icon';
   styleUrl: './builder-select-card.css',
 })
 export class BuilderSelectCard {
-  @Input() isQuiz: boolean = false;
-  setCorrect(index: number) {
-  this.bluePrint.options?.forEach((opt: any, i: number) => {
-    opt.isCorrect = i === index;
-  });
-}
-  @Input() bluePrint!:BuilderFieldSchema;
+  @Input() isQuizMode: boolean = false;
+  @Input() bluePrint!: BuilderFieldSchema;
   fieldData: BuilderFieldSchema = this.bluePrint;
 
   ngOnInit() {
     if (!this.fieldData.options) {
       this.fieldData.options = [{ label: 'Option 1', isCorrect: false }];
+      // this.fieldData.options = ['Option 1'];
     }
   }
 
@@ -39,13 +35,20 @@ export class BuilderSelectCard {
   }
 
   addOption() {
-  this.bluePrint.options?.push({
-    label: `Option ${this.bluePrint.options.length + 1}`,
-    isCorrect: false
-  });
-}
+    // this.bluePrint.options?.push(`Option ${this.bluePrint.options.length + 1}`);
+    this.bluePrint.options?.push({
+      label: `Option ${this.bluePrint.options.length + 1}`,
+      isCorrect: false
+    });
+  }
 
-  removeOption(index : number) {
+  setCorrect(index: number) {
+    this.bluePrint.options?.forEach((opt: any, i: number) => {
+      opt.isCorrect = i === index;
+    });
+  }
+
+  removeOption(index: number) {
     this.bluePrint.options?.splice(index, 1);
   }
 }

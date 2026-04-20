@@ -10,11 +10,6 @@
     @if (isSubmitted) {
     <div class="text-center p-20 bg-container shadow-xl border border-theme">
       <h1 class="text-3xl font-bold text-primary mb-2">Thank You!</h1>
-      @if (showScore) {
-      <div class="text-3xl font-bold text-green-600 mt-4">
-        Marks: {{ score }} 
-      </div>
-      }
       <p class="text-muted mb-8">Your response has been successfully recorded.</p>
       <button (click)="resetForm()" class="btn-primary px-6 py-2 rounded-xl font-bold">
         SUBMIT ANOTHER RESPONSE

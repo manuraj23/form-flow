@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FormSettingsMarks } from './form-settings-marks';
+import { FieldQuizConfig } from './field-quiz-config';
 
-describe('FormSettingsMarks', () => {
-  let component: FormSettingsMarks;
-  let fixture: ComponentFixture<FormSettingsMarks>;
+describe('FieldQuizConfig', () => {
+  let component: FieldQuizConfig;
+  let fixture: ComponentFixture<FieldQuizConfig>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FormSettingsMarks]
+      imports: [FieldQuizConfig]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(FormSettingsMarks);
+    fixture = TestBed.createComponent(FieldQuizConfig);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

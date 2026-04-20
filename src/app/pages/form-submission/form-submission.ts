@@ -46,8 +46,8 @@ import { Loader } from '../../components/loader/loader';
 })
 export class FormSubmission {
   score = 0;
-totalMarks = 0;
-showScore = false;
+  totalMarks = 0;
+  showScore = false;
   formGroup: FormGroup = new FormGroup({});
   formStructure: any;
   isReadOnly: boolean = false;
@@ -234,7 +234,7 @@ showScore = false;
     if (!logic || !logic.enabled) return true;
 
     const sourceValue = this.formGroup.get(logic.sourceFieldId)?.value;
-    
+
     let isMatch = false;
     if (Array.isArray(sourceValue)) {
       // For Checkbox
@@ -246,7 +246,7 @@ showScore = false;
     if (logic.operator === 'NOT_EQUALS') {
       isMatch = !isMatch;
     }
-    
+
     return logic.action === 'SHOW' ? isMatch : !isMatch;
   }
 
@@ -269,84 +269,87 @@ showScore = false;
     }
   }
 
-// submitResponse() {
-//   if (this.isReadOnly) {
-//     this.toastr.warning('This is a preview. Data is not saved to the database.');
-//     return;
   submitResponse() {
     if (this.isReadOnly) {
       this.toastr.warning('This is a preview. Data is not saved to the database.');
       return;
     }
-
     if (this.formGroup.valid) {
       this.isSubmitting = true;
 
-      const submissionData = {
-        submittedBy: this.authService.getCurrentUser()
-      }
+      this.formService.submitResponse(
+        this.formStructure.id,
+        this.formGroup.value
+      ).subscribe({
 
-      this.formService.submitResponse(this.formStructure.id, this.formGroup.value).subscribe({
-        next: (res) => {
+        next: (res: any) => {
           console.log(res);
+
           this.toastr.success('Response saved successfully!');
+
+          // backend score
+          this.score = res.score || 0;
+
+          // show only if quiz + enabled
+          this.showScore =
+            this.formStructure?.settings?.isQuiz &&
+            this.formStructure?.settings?.scoreShow;
+
           this.formGroup.reset();
           this.isSubmitting = false;
           this.isSubmitted = true;
+
           localStorage.removeItem(`form_draft_${this.formStructure.id}`);
         },
+
         error: (err) => {
-          console.error('Submission failed', err);
-          this.toastr.error('Could not save response. Please try again.');
+          console.error(err);
+          this.toastr.error('Could not save response.');
           this.isSubmitting = false;
-        },
+        }
+
       });
+
     } else {
       this.formGroup.markAllAsTouched();
       this.toastr.error('Please fix the errors before submitting.');
     }
   }
-//   if (this.formGroup.valid) {
-//     this.isSubmitting = true;
 
-//     this.formService.submitResponse(
-//       this.formStructure.id,
-//       this.formGroup.value
-//     ).subscribe({
+  // submitResponse() {
+  //   if (this.isReadOnly) {
+  //     this.toastr.warning('This is a preview. Data is not saved to the database.');
+  //     return;
+  //   }
 
-//       next: (res: any) => {
-//         console.log(res);
+  //   if (this.formGroup.valid) {
+  //     this.isSubmitting = true;
 
-//         this.toastr.success('Response saved successfully!');
+  //     const submissionData = {
+  //       submittedBy: this.authService.getCurrentUser()
+  //     }
 
-//         // backend score
-//         this.score = res.score || 0;
+  //     this.formService.submitResponse(this.formStructure.id, this.formGroup.value).subscribe({
+  //       next: (res) => {
+  //         console.log(res);
+  //         this.toastr.success('Response saved successfully!');
+  //         this.formGroup.reset();
+  //         this.isSubmitting = false;
+  //         this.isSubmitted = true;
+  //         localStorage.removeItem(`form_draft_${this.formStructure.id}`);
+  //       },
+  //       error: (err) => {
+  //         console.error('Submission failed', err);
+  //         this.toastr.error('Could not save response. Please try again.');
+  //         this.isSubmitting = false;
+  //       },
+  //     });
+  //   } else {
+  //     this.formGroup.markAllAsTouched();
+  //     this.toastr.error('Please fix the errors before submitting.');
+  //   }
+  // }
 
-//         // show only if quiz + enabled
-//         this.showScore =
-//           this.formStructure?.settings?.isQuiz &&
-//           this.formStructure?.settings?.scoreShow;
-
-//         this.formGroup.reset();
-//         this.isSubmitting = false;
-//         this.isSubmitted = true;
-
-//         localStorage.removeItem(`form_draft_${this.formStructure.id}`);
-//       },
-
-//       error: (err) => {
-//         console.error(err);
-//         this.toastr.error('Could not save response.');
-//         this.isSubmitting = false;
-//       }
-
-//     });
-
-//   } else {
-//     this.formGroup.markAllAsTouched();
-//     this.toastr.error('Please fix the errors before submitting.');
-//   }
-// }
   get currentUser(): string | null {
     return this.authService.getCurrentUser();
   }

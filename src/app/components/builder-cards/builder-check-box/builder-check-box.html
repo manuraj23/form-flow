@@ -1,14 +1,28 @@
 <div class="flex flex-col gap-3">
   @for (option of fieldData.options; let i = $index; track i) {
-    <div class="flex items-center gap-3 group">
-      <mat-checkbox disabled></mat-checkbox>
+  <div class="flex items-center gap-3 group">
+    <mat-checkbox disabled></mat-checkbox>
 
-      <input
-        [(ngModel)]="fieldData.options![i].label"
+    <!-- <input
+        [(ngModel)]="fieldData.options![i]"
         class="border-b border-transparent focus:border-theme outline-none text-sm w-full bg-transparent"
         placeholder="Option label"
-      />
-       @if (isQuiz) {
+      /> -->
+
+    <input [(ngModel)]="fieldData.options![i].label"
+      class="border-b border-transparent focus:border-theme outline-none text-sm w-full bg-transparent"
+      placeholder="Option label" />
+
+    @if (isQuizMode) {
+    <button mat-icon-button 
+            [class.color]="option.isCorrect ? 'primary' : 'default'"
+            (click)="toggleCorrect(i)"
+            matTooltip="Mark as a correct option">
+      <mat-icon>{{ option.isCorrect ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+    </button>
+  }
+
+    <!-- @if (isQuiz) {
     <button
       (click)="setCorrect(i)"
       class="px-2 py-1 text-xs rounded border"
@@ -16,36 +30,27 @@
       [class.text-white]="fieldData.options![i].isCorrect">
       Answer
     </button>
+  } -->
+
+    @if (fieldData.options!.length > 1) {
+    <button (click)="removeOption(i)"
+      class="text-red-400 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+      <mat-icon class="text-base">delete</mat-icon>
+    </button>
+    }
+  </div>
   }
 
-      @if (fieldData.options!.length > 1) {
-        <button
-          (click)="removeOption(i)"
-          class="text-red-400 opacity-0 group-hover:opacity-100 transition flex items-center justify-center"
-        >
-          <mat-icon class="text-base">delete</mat-icon>
-        </button>
-      }
-    </div>
-  }
-
-  <button
-    (click)="addOption()"
-    class="text-primary text-sm font-medium mt-2 text-left hover:underline"
-  >
+  <button (click)="addOption()" class="text-primary text-sm font-medium mt-2 text-left hover:underline">
     + Add Option
   </button>
 
   @if (fieldData.validations?.required) {
-    <div class="flex justify-start items-end">
-      <mat-icon
-        [style.color]="'var(--mat-sys-on-surface-variant)'"
-        style="font-size: 16px"
-        class="relative top-1"
-        >check_circle_outline</mat-icon
-      >
-      <span class="text-primary capitalize italic font-medium opacity-60">Required</span>
-    </div>
+  <div class="flex justify-start items-end">
+    <mat-icon [style.color]="'var(--mat-sys-on-surface-variant)'" style="font-size: 16px"
+      class="relative top-1">check_circle_outline</mat-icon>
+    <span class="text-primary capitalize italic font-medium opacity-60">Required</span>
+  </div>
   }
 </div>
 
@@ -61,8 +66,9 @@
 </div> -->
 
 @if (fieldData.fieldLogic?.enabled) {
-    <div class="absolute -top-3 left-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary text-white shadow-md z-10">
-      <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">account_tree</mat-icon>
-      <span class="text-[10px] font-bold uppercase tracking-tighter">Logic Enabled</span>
-    </div>
+<div
+  class="absolute -top-3 left-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary text-white shadow-md z-10">
+  <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">account_tree</mat-icon>
+  <span class="text-[10px] font-bold uppercase tracking-tighter">Logic Enabled</span>
+</div>
 }

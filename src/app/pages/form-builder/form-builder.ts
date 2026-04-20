@@ -25,7 +25,6 @@ import { ThemeService } from '../../services/theme-service';
 import { BuilderCheckBox } from '../../components/builder-cards/builder-check-box/builder-check-box';
 import { ToastrService } from 'ngx-toastr';
 import { FormSettingsDialog } from '../../components/form-settings-dialog/form-settings-dialog';
-import { FormSettingsMarks } from '../../components/form-settings-marks/form-settings-marks';
 import { ConditionalLogicService } from '../../services/conditional-logic-service';
 import { ConditionalLogic } from '../../components/conditional-logic/conditional-logic';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -74,6 +73,7 @@ export class FormBuilder {
   predefinedColours: string[] = ['#000000', '#EF4444', '#10B981', '#3B82F6'];
   mode: string = '';
   parentid: string | null = null;
+
   constructor(
     private dialog: MatDialog,
     private router: Router,
@@ -96,18 +96,16 @@ export class FormBuilder {
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
-    this.mode = params['mode'];
-    this.parentid = params['parentId'] || null;
+      this.mode = params['mode'];
+      this.parentid = params['parentId'] || null;
     });
-    console.log("create button parent id:",this.parentid);
-  
+    console.log("create button parent id:", this.parentid);
+
     this.editingFormId = this.route.snapshot.paramMap.get('id');
     console.log('Editing Form ID:', this.editingFormId);
     if (this.editingFormId) {
       this.loadFromForEditing(this.editingFormId);
     }
-
-  
 
     if (localStorage.getItem('prevTheme') === null) {
       localStorage.setItem('prevTheme', localStorage.getItem('theme') || 'theme-pink');
@@ -124,32 +122,38 @@ export class FormBuilder {
         this.themeService.loadTheme();
         this.formTitle = form.title;
         this.formDescription = form.description;
-        this.formSettings = form.settings;
+        this.formSettings = form.settings || { isQuizMode: false, defaultPointsPerField: 0 };
         this.formSections = form.sections.map((section: any) => ({
           id: section.id ? section.id.toString() : crypto.randomUUID(),
           title: section.sectionTitle,
-          sectionLogic: section.sectionLogic,
           fields: section.fields
             .sort((a: any, b: any) => a.fieldOrder - b.fieldOrder)
             .map((field: any, index: number) => ({
               id: field.id,
               type: field.fieldType,
-              label: field.fieldConfig.label,
-              validations: field.fieldConfig.validations || {},
-              options: (field.fieldConfig.options || []).map((opt: any) => ({
-                label: opt.label || opt,
-                isCorrect: opt.isCorrect || false
-              })),
-              correctAnswer: field.fieldConfig.correctAnswer || '',
-              placeholder: field.fieldConfig.placeholder || '',
+              fieldConfig: field.fieldConfig || {
+                label: field.fieldConfig.label,
+                validations: field.fieldConfig.validations || {},
+                options:
+                  (field.fieldConfig.options || []).map((opt: any) => ({
+                    label: opt.label || opt,
+                    isCorrect: opt.isCorrect || false
+                  })),
+                placeholder: field.fieldConfig.placeholder || '',
+              },
               fieldLogic: field.fieldLogic || {
                 enabled: false
               },
-              color: field.fieldStyle.color || '#000000',
-              fontSize: field.fieldStyle.fontSize || '12px',
-              bold: field.fieldStyle.bold || false,
-              italic: field.fieldStyle.italics || false,
-              underline: field.fieldStyle.underline || false,
+              fieldStyle: field.fieldStyle || {
+                color: field.fieldStyle.color || '#000000',
+                fontSize: field.fieldStyle.fontSize || '12px',
+                bold: field.fieldStyle.bold || false,
+                italic: field.fieldStyle.italics || false,
+                underline: field.fieldStyle.underline || false,
+              },
+              quizConfig: field.quizConfig || {
+                isScored: false,
+              }
             })),
         }));
         this.formSections = [...this.formSections];
@@ -172,12 +176,41 @@ export class FormBuilder {
       if (result) {
         this.formSettings = result;
 
+        if (result.isQuizMode && result.defaultPointsPerField > 0) {
+          this.applyBulkScores(result.defaultPointsPerField);
+        }
+
         // Force immediate UI refresh
         setTimeout(() => {
           this.cd.detectChanges();
         }, 0);
       }
-  });
+    });
+  }
+
+  applyBulkScores(points: number) {
+    this.formSections.forEach(section => {
+      section.fields.forEach((field: { type: string; quizConfig: { isScored: boolean; points: number; }; }) => {
+        if (['RADIO', 'CHECKBOX', 'DROPDOWN'].includes(field.type)) {
+          field.quizConfig.isScored = true;
+          field.quizConfig.points = points;
+        }
+      });
+    });
+    this.toastr.success(`Quiz Mode: All selection fields set to ${points} points.`);
+    this.cd.detectChanges();
+  }
+
+  get totalQuizScore(): number {
+    let total = 0;
+    this.formSections.forEach(section => {
+      section.fields.forEach((field: { quizConfig: { isScored: any; points: any; }; }) => {
+        if (field.quizConfig.isScored) {
+          total += (field.quizConfig.points || 0);
+        }
+      });
+    });
+    return total;
   }
 
   saveForm(isPublished: boolean) {
@@ -200,7 +233,7 @@ export class FormBuilder {
       title: this.formTitle,
       description: this.formDescription,
       sections: this.formSections,
-      pubilshed: isPublished,
+      published: isPublished,
       settings: this.formSettings,
     };
     console.log(formToSave);
@@ -208,20 +241,20 @@ export class FormBuilder {
     if (this.editingFormId) {
       this.formService.updateForm(formToSave).subscribe({
         next: (response) => {
-          
-          if(this.mode === 'version') {
+
+          if (this.mode === 'version') {
             this.toastr.success('Version Updated Successfully to Database!');
             this.router.navigate(['/versions', this.editingFormId]);
           }
-          else {   
+          else {
             if (!isPublished) {
-            this.toastr.success('Form Updated Successfully to Database!');
-          } else {
-            this.toastr.success('Form is Published!');
-          }          
+              this.toastr.success('Form Updated Successfully to Database!');
+            } else {
+              this.toastr.success('Form is Published!');
+            }
             this.router.navigate(['/']);
           }
-          
+
         },
         error: (err) => {
           console.error(err);
@@ -284,49 +317,6 @@ export class FormBuilder {
     return this.formSections.map((s) => s.id);
   }
 
-// onDrop(event: CdkDragDrop<any[]>, sectionIndex: number) {
-
-//   // Reorder inside same section
-//   if (event.previousContainer === event.container) {
-//     moveItemInArray(
-//       event.container.data,
-//       event.previousIndex,
-//       event.currentIndex
-//     );
-//     return;
-//   }
-
-//   // Sidebar → Canvas
-//   if (event.previousContainer.id === 'sidebar') {
-
-//     // IMPORTANT: Deep clone dragged item
-//     const draggedItem = JSON.parse(
-//       JSON.stringify(event.item.data)
-//     );
-
-//     const isQuiz = this.formSettings?.isQuiz;
-
-//     const newField: any = {
-//       id: Date.now().toString(),
-//       type: draggedItem.type,
-//       label: draggedItem.label,
-//       validations: {},
-//       placeholder: '',
-//       options: [],
-//       color: '#000000',
-//       fontSize: '12px',
-//       bold: false,
-//       italic: false,
-//       underline: false,
-//     };
-
-//     // Assign options ONLY for correct types
-//     if (['CHECKBOX', 'RADIO', 'DROPDOWN'].includes(newField.type)) {
-//       newField.options = [
-//         { label: 'Option 1', isCorrect: false },
-//         { label: 'Option 2', isCorrect: false }
-//       ];
-      
   onDrop(event: CdkDragDrop<any[]>, sectionIndex: number) {
     if (event.previousContainer === event.container) {
       // Rearrange
@@ -338,18 +328,27 @@ export class FormBuilder {
       const newField = {
         id: crypto.randomUUID(),
         type: field.type,
-        label: field.label,
-        validations: {},
-        options: ['CHECKBOX', 'RADIO', 'DROPDOWN'].includes(field.type) ? ['Option 1'] : [],
-        placeholder: field.placeholder || '',
+        fieldConfig: {
+          label: field.label,
+          validations: {},
+          options: ['CHECKBOX', 'RADIO', 'DROPDOWN'].includes(field.type) ? [{ label: 'Option 1', isCorrect: false }] : [],
+          placeholder: field.placeholder || '',
+        },
         fieldLogic: {
           enabled: false
         },
-        color: '#000000',
-        fontSize: '12px',
-        bold: false,
-        italic: false,
-        underline: false,
+        fieldStyle: {
+          color: '#000000',
+          fontSize: '12px',
+          bold: false,
+          italic: false,
+          underline: false,
+        },
+        quizConfig: ['CHECKBOX', 'RADIO', 'DROPDOWN'].includes(field.type) && this.formSettings?.isQuizMode ? {
+          isScored: true,
+          points: this.formSettings.defaultPointsPerField || 0,
+          negativeMarks: 0
+        } : { isScored: false },
       };
 
       this.formSections[sectionIndex].fields.splice(event.currentIndex, 0, newField);
@@ -361,35 +360,8 @@ export class FormBuilder {
         event.currentIndex,
       );
     }
-
-    if (isQuiz) {
-      if (newField.type === 'TEXT') {
-        newField.correctAnswer = '';
-      }
-    }
-    // Insert into section
-    this.formSections[sectionIndex].fields.splice(
-      event.currentIndex,
-      0,
-      newField
-    );
-
-    //Force UI refresh (important)
-    this.formSections = [...this.formSections];
-    return;
   }
 
-  // Between sections
-  transferArrayItem(
-    event.previousContainer.data,
-    event.container.data,
-    event.previousIndex,
-    event.currentIndex
-  );
-
-  // Refresh
-  this.formSections = [...this.formSections];
-}
   onSectionDrop(event: CdkDragDrop<any[]>) {
     moveItemInArray(this.formSections, event.previousIndex, event.currentIndex);
   }
@@ -417,7 +389,10 @@ export class FormBuilder {
 
     const dialogRef = this.dialog.open(EditField, {
       width: '400px',
-      data: fieldToEdit,
+      data: {
+        field: fieldToEdit,
+        isQuizMode: this.formSettings?.isQuizMode || false,
+      },
       panelClass: 'custom-dialog-container',
     });
 
@@ -466,25 +441,20 @@ export class FormBuilder {
           fieldOrder: fIndex + 1,
           id: field.id || `temp_${fIndex}`,
           fieldConfig: {
-            label: field.label,
-            placeholder: field.placeholder,
-            options: field.options,
-            validations: field.validations,
+            label: field.fieldConfig.label,
+            placeholder: field.fieldConfig.placeholder,
+            options: field.fieldConfig.options,
+            validations: field.fieldConfig.validations,
           },
           fieldStyle: {
-            color: field.color,
-            fontSize: field.fontSize,
-            bold: field.bold,
-            italics: field.italics,
-            underline: field.underline
+            color: field.fieldStyle.color,
+            fontSize: field.fieldStyle.fontSize,
+            bold: field.fieldStyle.bold,
+            italics: field.fieldStyle.italics,
+            underline: field.fieldStyle.underline
           },
-          fieldLogic: {
-            enabled: field.fieldLogic.enabled,
-            sourceFieldId: field.fieldLogic.sourceFieldId,
-            operator: field.fieldLogic.operator,
-            value: field.fieldLogic.value,
-            action: field.fieldLogic.action
-          }
+          fieldLogic: field.fieldLogic,
+          quizConfig: field.quizConfig,
         })),
       })),
       isReadOnly: true,
@@ -495,8 +465,6 @@ export class FormBuilder {
       data: previewData,
     });
   }
-
-
 
   saveVersion(isPublished: boolean) {
     const hasFields = this.formSections.some(
@@ -517,73 +485,149 @@ export class FormBuilder {
       title: this.formTitle,
       description: this.formDescription,
       sections: this.formSections,
-      pubilshed: true,
+      published: true,
       settings: this.formSettings,
       mainParentId: this.parentid,
     };
     console.log(formToSave);
     console.log('Parent id:', formToSave.mainParentId);
-      
-    this.formService.createForm(formToSave).subscribe({
-        next: (response) => {
-          if (!isPublished) {
-            this.toastr.success('Form Saved Successfully to Database!');
-          } else {
-            this.toastr.success('Form is Published!');
-          }
 
-          this.router.navigate(['/']);
-        },
-        error: (err) => {
-          console.error(err);
-          this.toastr.error('Error saving form.');
-        },
-      });
-    
+    this.formService.createForm(formToSave).subscribe({
+      next: (response) => {
+        if (!isPublished) {
+          this.toastr.success('Form Saved Successfully to Database!');
+        } else {
+          this.toastr.success('Form is Published!');
+        }
+
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error('Error saving form.');
+      },
+    });
+
     localStorage.setItem('theme', localStorage.getItem('prevTheme') || 'theme-pink');
     localStorage.removeItem('prevTheme');
     this.themeService.loadTheme();
   }
 
 
-  openSectionSettings(sectionIndex: number) {
-    if (!this.formSettings?.isQuiz) {
-      this.toastr.warning('Enable Quiz mode to use marks settings');
-      return;
-    }
+  // onDrop(event: CdkDragDrop<any[]>, sectionIndex: number) {
 
-    const dialogRef = this.dialog.open(FormSettingsMarks, {
-      width: '350px',
-      maxWidth: '90vw',
-      data: {
-        positiveMarks: this.formSections[sectionIndex]?.positiveMarks || 0,
-        negativeMarks: this.formSections[sectionIndex]?.negativeMarks || 0
-      }
-    });
+  //   // Reorder inside same section
+  //   if (event.previousContainer === event.container) {
+  //     moveItemInArray(
+  //       event.container.data,
+  //       event.previousIndex,
+  //       event.currentIndex
+  //     );
+  //     return;
+  //   }
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.formSections[sectionIndex] = {
-          ...this.formSections[sectionIndex],
-          positiveMarks: result.positiveMarks,
-          negativeMarks: result.negativeMarks
-        };
-      }
-    });
-  }
+  //   // Sidebar → Canvas
+  //   if (event.previousContainer.id === 'sidebar') {
 
-  get filteredElements() {
-    if (this.formSettings?.isQuiz) {
-      return this.elements.filter(el =>
-        ['TEXT', 'CHECKBOX', 'DROPDOWN', 'RADIO'].includes(el.type)
-      );
-    }
-    return this.elements;
-  }
+  //     // IMPORTANT: Deep clone dragged item
+  //     const draggedItem = JSON.parse(
+  //       JSON.stringify(event.item.data)
+  //     );
 
-  setCorrectOption(field: any, index: number) {
-  field.options.forEach((opt: any, i: number) => {
-    opt.isCorrect = i === index;
-  });
-}
+  //     const isQuiz = this.formSettings?.isQuiz;
+
+  //     const newField: any = {
+  //       id: Date.now().toString(),
+  //       type: draggedItem.type,
+  //       fieldConfig: {
+  //         label: draggedItem.label,
+  //         validations: {},
+  //         placeholder: '',
+  //         options: [],
+  //       },
+  //       fieldStyle: {
+  //       color: '#000000',
+  //       fontSize: '12px',
+  //       bold: false,
+  //       italic: false,
+  //       underline: false,
+  //       }
+  //     };
+
+  //     // Assign options ONLY for correct types
+  //     if (['CHECKBOX', 'RADIO', 'DROPDOWN'].includes(newField.type)) {
+  //       newField.options = [
+  //         { label: 'Option 1', isCorrect: false },
+  //         { label: 'Option 2', isCorrect: false }
+  //       ];
+  //       if (isQuiz) {
+  //         if (newField.type === 'TEXT') {
+  //           newField.correctAnswer = '';
+  //         }
+  //       }
+  //       // Insert into section
+  //       this.formSections[sectionIndex].fields.splice(
+  //         event.currentIndex,
+  //         0,
+  //         newField
+  //       );
+
+  //       //Force UI refresh (important)
+  //       this.formSections = [...this.formSections];
+  //       return;
+  //     }
+
+  //     // Between sections
+  //     transferArrayItem(
+  //       event.previousContainer.data,
+  //       event.container.data,
+  //       event.previousIndex,
+  //       event.currentIndex
+  //     );
+
+  //     // Refresh
+  //     this.formSections = [...this.formSections];
+  //   }
+  // }
+
+  // openSectionSettings(sectionIndex: number) {
+  //   if (!this.formSettings?.isQuiz) {
+  //     this.toastr.warning('Enable Quiz mode to use marks settings');
+  //     return;
+  //   }
+
+  //   const dialogRef = this.dialog.open(FormSettingsMarks, {
+  //     width: '350px',
+  //     maxWidth: '90vw',
+  //     data: {
+  //       positiveMarks: this.formSections[sectionIndex]?.positiveMarks || 0,
+  //       negativeMarks: this.formSections[sectionIndex]?.negativeMarks || 0
+  //     }
+  //   });
+
+  //   dialogRef.afterClosed().subscribe(result => {
+  //     if (result) {
+  //       this.formSections[sectionIndex] = {
+  //         ...this.formSections[sectionIndex],
+  //         positiveMarks: result.positiveMarks,
+  //         negativeMarks: result.negativeMarks
+  //       };
+  //     }
+  //   });
+  // }
+
+  // get filteredElements() {
+  //   if (this.formSettings?.isQuiz) {
+  //     return this.elements.filter(el =>
+  //       ['TEXT', 'CHECKBOX', 'DROPDOWN', 'RADIO'].includes(el.type)
+  //     );
+  //   }
+  //   return this.elements;
+  // }
+
+  // setCorrectOption(field: any, index: number) {
+  //   field.options.forEach((opt: any, i: number) => {
+  //     opt.isCorrect = i === index;
+  //   });
+  // }
 }

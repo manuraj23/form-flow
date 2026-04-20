@@ -12,7 +12,7 @@ import { MatIcon } from "@angular/material/icon";
   styleUrl: './builder-input-text.css',
 })
 export class BuilderInputText {
-  @Input() isQuiz: boolean = false;
+  // @Input() isQuiz: boolean = false;
 
   @Input() bluePrint!: BuilderFieldSchema;
 fieldData!: BuilderFieldSchema;
@@ -33,7 +33,7 @@ updateUI(data: BuilderFieldSchema) {
 
   this.type = this.fieldData.validations?.email ? 'email' : 'text';
 
-  if (this.isQuiz && this.fieldData.correctAnswer === undefined) {
-    this.fieldData.correctAnswer = '';
-  }
+  // if (this.isQuiz && this.fieldData.correctAnswer === undefined) {
+  //   this.fieldData.correctAnswer = '';
+  // }
 }}
