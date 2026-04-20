@@ -237,6 +237,10 @@ deleteAllVersions(formId: string) {
     return this.http.put(this.url + 'group/' + groupId + '/update', data, {responseType: 'text'});
   }
 
+  assignFormToGroup(groupId : string, formId : string) {
+    return this.http.post(this.url + `group/${groupId}/assignForm/${formId}`, {});
+  }
+
 }
 
 
