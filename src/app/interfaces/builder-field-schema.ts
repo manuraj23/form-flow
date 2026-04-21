@@ -21,10 +21,6 @@ export interface BuilderFieldSchema {
   placeholder?: string,
   validations?: ValidationRules,
   fieldLogic?: CondLogicSchema,
-  options?:
-  {
-    label: string;
-    isCorrect?: boolean;
-  }[],
+  options?: string[] ,
   quizConfig?: Quizconfigschema
 }

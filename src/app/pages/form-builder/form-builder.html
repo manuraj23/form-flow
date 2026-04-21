@@ -115,7 +115,7 @@
               <div class="mb-4">
                 <mat-icon cdkDragHandle class="text-muted cursor-move text-base"
                   matTooltip="Drag to reorder field">drag_handle</mat-icon>
-                <input [(ngModel)]="field.label"
+                 <input [(ngModel)]="field.label"
                   (click)="selectField(sectionIndex, fieldIndex); $event.stopPropagation()" [ngStyle]="{
                                                                 'font-size': field.fontSize,
                                                                 'font-weight': field.bold ? 'bold' : 'normal',
@@ -164,8 +164,19 @@
 
               <!-- toolbar end -->
 
-
-              <div class="opacity-90">
+               <div class="opacity-90">
+                <app-builder-input-text *ngIf="field.type === 'TEXT' || field.type === 'number'"
+                  [bluePrint]="field"></app-builder-input-text>
+                <app-builder-file-upload *ngIf="field.type === 'FILE'" [bluePrint]="field"></app-builder-file-upload>
+                <app-builder-check-box *ngIf="field.type === 'CHECKBOX'" [bluePrint]="field"
+                > </app-builder-check-box>
+                <app-builder-radio-button *ngIf="field.type === 'RADIO'" [bluePrint]="field"
+                  ></app-builder-radio-button>
+                <app-builder-select-card *ngIf="field.type === 'DROPDOWN'" [bluePrint]="field"
+                  ></app-builder-select-card>
+                <app-builder-textarea *ngIf="field.type === 'TEXTAREA'" [bluePrint]="field"></app-builder-textarea>
+              </div>
+              <!-- <div class="opacity-90">
                 <app-builder-input-text *ngIf="field.type === 'TEXT' || field.type === 'number'"
                   [bluePrint]="field"></app-builder-input-text>
                 <app-builder-file-upload *ngIf="field.type === 'FILE'" [bluePrint]="field"></app-builder-file-upload>
@@ -176,7 +187,7 @@
                 <app-builder-select-card *ngIf="field.type === 'DROPDOWN'" [bluePrint]="field"
                   [isQuizMode]="formSettings?.isQuizMode || false"></app-builder-select-card>
                 <app-builder-textarea *ngIf="field.type === 'TEXTAREA'" [bluePrint]="field"></app-builder-textarea>
-              </div>
+              </div> -->
 
               <div class="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button (click)="duplicateField(sectionIndex, fieldIndex)" class="p-1.5 text-muted hover:text-primary"

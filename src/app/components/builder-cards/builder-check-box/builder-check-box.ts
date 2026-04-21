@@ -5,7 +5,7 @@ import { CheckboxField } from '../../../interfaces/field-config-schema';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { BuilderFieldSchema } from '../../../interfaces/builder-field-schema';
 import { FormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
+import {MatIconModule} from '@angular/material/icon';
 
 @Component({
   selector: 'app-builder-check-box',
@@ -14,13 +14,12 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './builder-check-box.css',
 })
 export class BuilderCheckBox {
-  @Input() bluePrint!: BuilderFieldSchema;
-  @Input() isQuizMode: boolean = false;
+  @Input() bluePrint!:BuilderFieldSchema;
   fieldData: BuilderFieldSchema = this.bluePrint;
 
   ngOnInit() {
     if (!this.fieldData.options) {
-      this.fieldData.options = [{ label: 'Option 1', isCorrect: false }];
+      this.fieldData.options = ['Option 1'];
     }
   }
 
@@ -35,21 +34,10 @@ export class BuilderCheckBox {
   }
 
   addOption() {
-    this.bluePrint.options?.push({
-      label: `Option ${this.bluePrint.options.length + 1}`,
-      isCorrect: false
-    });
+    this.bluePrint.options?.push(`Option ${this.bluePrint.options.length + 1}`);
   }
 
-  toggleCorrect(optionIndex: number) {
-    const option = this.bluePrint.options?.[optionIndex];
-
-    if (option) {
-      option.isCorrect = !option.isCorrect;
-    }
-  }
-
-  removeOption(index: number) {
+  removeOption(index : number) {
     this.bluePrint.options?.splice(index, 1);
   }
 }

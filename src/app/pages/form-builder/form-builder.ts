@@ -131,26 +131,18 @@ export class FormBuilder {
             .map((field: any, index: number) => ({
               id: field.id,
               type: field.fieldType,
-              fieldConfig: field.fieldConfig || {
-                label: field.fieldConfig.label,
-                validations: field.fieldConfig.validations || {},
-                options:
-                  (field.fieldConfig.options || []).map((opt: any) => ({
-                    label: opt.label || opt,
-                    isCorrect: opt.isCorrect || false
-                  })),
-                placeholder: field.fieldConfig.placeholder || '',
-              },
+              label: field.fieldConfig.label,
+              validations: field.fieldConfig.validations || {},
+              options: field.fieldConfig.options,
+              placeholder: field.fieldConfig.placeholder || '',
               fieldLogic: field.fieldLogic || {
                 enabled: false
               },
-              fieldStyle: field.fieldStyle || {
-                color: field.fieldStyle.color || '#000000',
-                fontSize: field.fieldStyle.fontSize || '12px',
-                bold: field.fieldStyle.bold || false,
-                italic: field.fieldStyle.italics || false,
-                underline: field.fieldStyle.underline || false,
-              },
+              color: field.fieldStyle.color || '#000000',
+              fontSize: field.fieldStyle.fontSize || '12px',
+              bold: field.fieldStyle.bold || false,
+              italic: field.fieldStyle.italics || false,
+              underline: field.fieldStyle.underline || false,
               quizConfig: field.quizConfig || {
                 isScored: false,
               }
@@ -328,26 +320,23 @@ export class FormBuilder {
       const newField = {
         id: crypto.randomUUID(),
         type: field.type,
-        fieldConfig: {
-          label: field.label,
-          validations: {},
-          options: ['CHECKBOX', 'RADIO', 'DROPDOWN'].includes(field.type) ? [{ label: 'Option 1', isCorrect: false }] : [],
-          placeholder: field.placeholder || '',
-        },
+        label: field.label,
+        validations: {},
+        options: ['CHECKBOX', 'RADIO', 'DROPDOWN'].includes(field.type) ? ['Option 1'] : [],
+        placeholder: field.placeholder || '',
         fieldLogic: {
           enabled: false
         },
-        fieldStyle: {
-          color: '#000000',
-          fontSize: '12px',
-          bold: false,
-          italic: false,
-          underline: false,
-        },
+        color: '#000000',
+        fontSize: '12px',
+        bold: false,
+        italic: false,
+        underline: false,
         quizConfig: ['CHECKBOX', 'RADIO', 'DROPDOWN'].includes(field.type) && this.formSettings?.isQuizMode ? {
           isScored: true,
           points: this.formSettings.defaultPointsPerField || 0,
-          negativeMarks: 0
+          negativeMarks: 0,
+          correctAnswer: '',
         } : { isScored: false },
       };
 
@@ -440,18 +429,18 @@ export class FormBuilder {
           fieldType: field.type,
           fieldOrder: fIndex + 1,
           id: field.id || `temp_${fIndex}`,
-          fieldConfig: {
-            label: field.fieldConfig.label,
-            placeholder: field.fieldConfig.placeholder,
-            options: field.fieldConfig.options,
-            validations: field.fieldConfig.validations,
+           fieldConfig: {
+            label: field.label,
+            placeholder: field.placeholder,
+            options: field.options,
+            validations: field.validations,
           },
           fieldStyle: {
-            color: field.fieldStyle.color,
-            fontSize: field.fieldStyle.fontSize,
-            bold: field.fieldStyle.bold,
-            italics: field.fieldStyle.italics,
-            underline: field.fieldStyle.underline
+            color: field.color,
+            fontSize: field.fontSize,
+            bold: field.bold,
+            italics: field.italics,
+            underline: field.underline
           },
           fieldLogic: field.fieldLogic,
           quizConfig: field.quizConfig,

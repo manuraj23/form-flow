@@ -23,68 +23,35 @@ export class FormService {
       theme: localStorage.getItem('theme') || 'theme-pink',
       title: rawForm.title,
       description: rawForm.description,
-      published: rawForm.pubilshed,
-      settings: {
-        ...rawForm.settings,
-        scoreShow: rawForm.settings?.showScore ?? false
-      },
+      published: rawForm.published,
+      settings: rawForm.settings,
       mainParentId: rawForm.mainParentId,
-
       sections: rawForm.sections.map((section: any, sectionIndex: number) => ({
         id: section.id,
         sectionTitle: section.title,
         sectionOrder: sectionIndex + 1,
 
-        // ADD MARKS
-        positiveMarks: section.positiveMarks || 0,
-        negativeMarks: section.negativeMarks || 0,
+        fields: section.fields.map((field: any, fieldIndex: number) => ({
+          id: field.id,
+          fieldType: field.type,
+          fieldOrder: fieldIndex + 1,
 
-        fields: section.fields.map((field: any, fieldIndex: number) => {
-
-          //Extract options as string[]
-          const optionsArray = (field.options || []).map((opt: any) => opt.label);
-
-          //Find correct answer for MCQ
-          const correctOption = (field.options || []).find((opt: any) => opt.isCorrect);
-
-          return {
-            id: field.id,
-            fieldType: field.type,
-            fieldOrder: fieldIndex + 1,
-
-            fieldConfig: {
-              label: field.label,
-
-              //convert required properly
-              required: field.validations?.required || false,
-
-              //send plain options array
-              options: optionsArray,
-
-              //answer logic
-              answer: field.type === 'TEXT'
-                ? field.correctAnswer || ''
-                : correctOption?.label || '',
-
-              placeholder: field.placeholder
-            },
-
-            fieldStyle: {
-              color: field.color,
-              fontSize: field.fontSize,
-              bold: field.bold,
-              italic: field.italic,
-              underline: field.underline,
-            },
-            fieldLogic: {
-              enabled: field.fieldLogic.enabled,
-              sourceFieldId: field.fieldLogic.sourceFieldId,
-              operator: field.fieldLogic.operator,
-              value: field.fieldLogic.value,
-              action: field.fieldLogic.action
-            }
-          }
-        }),
+          fieldConfig: {
+            label: field.label,
+            validations: field.validations,
+            options: field.options,
+            placeholder: field.placeholder,
+          },
+          fieldStyle: {
+            color: field.color,
+            fontSize: field.fontSize,
+            bold: field.bold,
+            italic: field.italic,
+            underline: field.underline,
+          },
+          fieldLogic: field.fieldLogic,
+          quizConfig: field.quizConfig
+        })),
       })),
     }
   }
@@ -119,6 +86,7 @@ export class FormService {
 
   createForm(formData: any): Observable<any> {
     const mappedData = this.mapToFormSchema(formData);
+    console.log(mappedData);
     let data: any = this.http.post(this.url + 'user/createForm', mappedData, {
       responseType: 'text',
     });

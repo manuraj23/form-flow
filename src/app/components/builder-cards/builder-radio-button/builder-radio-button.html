@@ -1,59 +1,41 @@
 <mat-radio-group class="flex flex-col gap-3">
 
   @for (option of fieldData.options; let i = $index; track i) {
-  <div class="flex items-center gap-3 group">
+    <div class="flex items-center gap-3 group">
 
-    <mat-radio-button disabled></mat-radio-button>
-    <!-- <input [(ngModel)]="fieldData.options![i]"
-      class="border-b border-transparent focus:border-theme outline-none text-sm w-full bg-transparent"
-      placeholder="Option label" /> -->
-
+      <mat-radio-button disabled></mat-radio-button>
       <input
-        [(ngModel)]="fieldData.options![i].label"
+        [(ngModel)]="fieldData.options![i]"
         class="border-b border-transparent focus:border-theme outline-none text-sm w-full bg-transparent"
         placeholder="Option label"
       />
 
-      @if (isQuizMode) {
-      <button mat-icon-button [class.color]="option.isCorrect ? 'primary' : 'default'" (click)="setCorrect(i)"
-        matTooltip="Set as correct answer">
-        <mat-icon>{{ option.isCorrect ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
-      </button>
+      @if (fieldData.options!.length > 1) {
+        <button
+          (click)="removeOption(i)"
+          class="p-1 rounded-full text-red-400 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition">
+          
+          <mat-icon class="text-base">delete</mat-icon>
+
+        </button>
       }
 
-    <!-- @if (isQuiz) {
-    <button
-      (click)="setCorrect(i)"
-      class="px-2 py-1 text-xs rounded border"
-      [class.bg-green-500]="fieldData.options![i].isCorrect"
-      [class.text-white]="fieldData.options![i].isCorrect">
-      Answer
-    </button>
-  } -->
-    @if (fieldData.options!.length > 1) {
-    <button (click)="removeOption(i)"
-      class="p-1 rounded-full text-red-400 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition">
-
-      <mat-icon class="text-base">delete</mat-icon>
-
-    </button>
-    }
-
-  </div>
+    </div>
   }
 
 </mat-radio-group>
 
-<button (click)="addOption()" class="text-primary text-sm font-medium mt-2 text-left hover:underline block pb-5">
+<button
+  (click)="addOption()"
+  class="text-primary text-sm font-medium mt-2 text-left hover:underline block pb-5">
   + Add Option
 </button>
 
 @if (fieldData.validations?.required) {
-<div class="flex justify-start items-end">
-  <mat-icon [style.color]="'var(--mat-sys-on-surface-variant)'" style="font-size: 16px;"
-    class="relative top-1">check_circle_outline</mat-icon>
-  <span class="text-primary capitalize italic font-medium opacity-60">Required</span>
-</div>
+  <div class="flex justify-start items-end">
+    <mat-icon [style.color]="'var(--mat-sys-on-surface-variant)'" style="font-size: 16px;" class="relative top-1">check_circle_outline</mat-icon>
+    <span class="text-primary capitalize italic font-medium opacity-60">Required</span>
+  </div>
 }
 
 <!-- <mat-radio-group>
@@ -68,9 +50,8 @@
 } -->
 
 @if (fieldData.fieldLogic?.enabled) {
-<div
-  class="absolute -top-3 left-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary text-white shadow-md z-10">
-  <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">account_tree</mat-icon>
-  <span class="text-[10px] font-bold uppercase tracking-tighter">Logic Enabled</span>
-</div>
+    <div class="absolute -top-3 left-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary text-white shadow-md z-10">
+      <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">account_tree</mat-icon>
+      <span class="text-[10px] font-bold uppercase tracking-tighter">Logic Enabled</span>
+    </div>
 }

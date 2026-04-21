@@ -1,17 +1,6 @@
 <mat-form-field appearance="outline" class="w-full">
   <input matInput [type]="type" [placeholder]="fieldData.placeholder ?? 'input here...'" />
 </mat-form-field>
-<!-- @if (isQuiz) {
-  <div class="mt-3 flex items-center gap-3">
-    <mat-icon class="text-green-500 text-base">task_alt</mat-icon>
-
-    <input
-      [(ngModel)]="fieldData.correctAnswer"
-      placeholder="Enter correct answer"
-      class="border-b border-transparent focus:border-green-500 outline-none text-sm bg-transparent w-full"
-    />
-  </div>
-} -->
 @if (fieldData.validations?.required) {
 <div class="flex justify-start items-end">
   <mat-icon [style.color]="'var(--mat-sys-on-surface-variant)'" style="font-size: 16px;"

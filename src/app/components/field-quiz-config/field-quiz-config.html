@@ -8,7 +8,8 @@
       <p class="font-semibold text-primary">Enable Scoring</p>
       <p class="text-xs text-muted">Include this field in the total quiz grade.</p>
     </div>
-    <mat-slide-toggle [(ngModel)]="field.quizConfig.isScored" (ngModelChange)="onValueChange()" color="primary"></mat-slide-toggle>
+    <mat-slide-toggle [(ngModel)]="field.quizConfig.isScored" (ngModelChange)="onValueChange()"
+      color="primary"></mat-slide-toggle>
   </div>
 
   @if (field?.quizConfig?.isScored) {
@@ -20,28 +21,34 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Negative Marks</mat-label>
-      <input matInput type="number" [(ngModel)]="field.quizConfig.negativeMarks" (ngModelChange)="onValueChange()" min="0">
+      <input matInput type="number" [(ngModel)]="field.quizConfig.negativeMarks" (ngModelChange)="onValueChange()"
+        min="0">
       <mat-hint class="text-[10px] text-muted mt-2 italic">
-      Penalty for wrong answer
+        Penalty for wrong answer
       </mat-hint>
     </mat-form-field>
   </div>
 
-  <!-- <div class="mt-2">
-    <p class="text-xs font-bold text-muted uppercase mb-2">Answer Key Verification</p>
-    <div class="space-y-2">
-      <div *ngFor="let opt of field.fieldConfig?.options"
-        class="flex items-center gap-2 p-2 rounded-lg border border-dashed"
-        [ngClass]="opt.isCorrect ? 'border-green-500 bg-green-50/50' : 'border-gray-200'">
-        <mat-icon [class.color]="opt.isCorrect ? 'primary' : ''" class="text-sm">
-          {{ opt.isCorrect ? 'check_circle' : 'circle' }}
-        </mat-icon>
-        <span class="text-sm" [class.font-bold]="opt.isCorrect">{{ opt.label }}</span>
-      </div>
-    </div>
-    <p class="text-[10px] text-muted mt-2 italic">
-      * Change correct answers directly on the form canvas.
+  <div class="mt-4">
+    <p class="text-xs font-bold text-muted uppercase mb-2 tracking-wider">
+      Define Correct Answer(s)
     </p>
-  </div> -->
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Select the correct answer</mat-label>
+
+      <mat-select [(ngModel)]="field.quizConfig.correctAnswer" (ngModelChange)="onValueChange()"
+        [multiple]="field.type === 'CHECKBOX'">
+
+        <mat-option *ngFor="let opt of field.options" [value]="opt">
+          {{ opt }}
+        </mat-option>
+      </mat-select>
+
+      <mat-hint>
+        {{ field.type === 'CHECKBOX' ? 'You can select multiple answers' : 'Select one answer' }}
+      </mat-hint>
+    </mat-form-field>
+  </div>
   }
 </div>
