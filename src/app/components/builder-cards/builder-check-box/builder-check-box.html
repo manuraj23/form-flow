@@ -1,15 +1,36 @@
+@if (fieldData?.quizConfig?.isScored) {
+<div
+  class="absolute -top-3 right-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-600 text-white shadow-md z-10">
+  <span class="text-[10px] font-bold uppercase tracking-tighter">
+    {{ fieldData?.quizConfig?.points }} PTS
+    @if (fieldData.quizConfig?.negativeMarks && fieldData.quizConfig!.negativeMarks > 0) {
+    <span class="text-red-200 ml-1">(-{{ fieldData?.quizConfig?.negativeMarks }})</span>
+    }
+  </span>
+</div>
+}
 <div class="flex flex-col gap-3">
-  @for (option of fieldData.options; let i = $index; track i) {
-    <div class="flex items-center gap-3 group">
-      <mat-checkbox disabled></mat-checkbox>
+  @for (option of fieldData?.options; let i = $index; track i) {
+    <div class="flex items-center gap-3 group p-2 rounded-xl transition-all duration-300"
+         [class.bg-green-50]="isOptionCorrect(fieldData.options![i])"
+         [class.border-green-200]="isOptionCorrect(fieldData.options![i])"
+         [class.border]="isOptionCorrect(fieldData.options![i])">
+
+      @if (isOptionCorrect(fieldData.options![i])) {
+        <mat-icon class="text-green-600 scale-90">check_box</mat-icon>
+      } @else {
+        <mat-checkbox disabled></mat-checkbox>
+      }
 
       <input
         [(ngModel)]="fieldData.options![i]"
         class="border-b border-transparent focus:border-theme outline-none text-sm w-full bg-transparent"
+        [class.font-bold]="isOptionCorrect(fieldData.options![i])"
+        [class.text-green-700]="isOptionCorrect(fieldData.options![i])"
         placeholder="Option label"
       />
 
-      @if (fieldData.options!.length > 1) {
+      @if (fieldData.options && fieldData.options.length > 1) {
         <button
           (click)="removeOption(i)"
           class="text-red-400 opacity-0 group-hover:opacity-100 transition flex items-center justify-center"
@@ -26,6 +47,13 @@
   >
     + Add Option
   </button>
+
+  @if (fieldData.quizConfig?.isScored && !fieldData.quizConfig?.correctAnswer) {
+<p class="text-[10px] text-primary font-bold mt-2 flex items-center gap-1">
+  <mat-icon class="!w-3 !h-3 !text-[12px]">warning</mat-icon>
+  No correct answer selected
+</p>
+}
 
   @if (fieldData.validations?.required) {
     <div class="flex justify-start items-end">
