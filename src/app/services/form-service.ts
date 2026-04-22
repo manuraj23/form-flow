@@ -17,7 +17,7 @@ export class FormService {
   constructor(
     private http: HttpClient,
     private themeService: ThemeService,
-  ) {}
+  ) { }
 
   mapToFormSchema(rawForm: any): Form {
     return {
@@ -25,7 +25,7 @@ export class FormService {
       theme: localStorage.getItem('theme') || 'theme-pink',
       title: rawForm.title,
       description: rawForm.description,
-      published: rawForm.pubilshed,
+      published: rawForm.published,
       settings: rawForm.settings,
       mainParentId: rawForm.mainParentId,
       sections: rawForm.sections.map((section: any, sectionIndex: number) => ({
@@ -51,9 +51,11 @@ export class FormService {
             italic: field.italic,
             underline: field.underline,
           },
+          fieldLogic: field.fieldLogic,
+          quizConfig: field.quizConfig
         })),
       })),
-    };
+    }
   }
 
   private mapToFormData(formId: string, rawValue: any): FormData {
@@ -86,6 +88,7 @@ export class FormService {
 
   createForm(formData: any): Observable<any> {
     const mappedData = this.mapToFormSchema(formData);
+    console.log(mappedData);
     let data: any = this.http.post(this.url + 'user/createForm', mappedData, {
       responseType: 'text',
     });
@@ -100,17 +103,18 @@ export class FormService {
     return data;
   }
 
-  getFormById(id: string): Observable<Form>{
-    return this.http.get<Form>(this.url + 'user/form/' + id); 
+  getFormById(id: string): Observable<Form> {
+    return this.http.get<Form>(this.url + 'user/form/' + id);
   }
 
   getResponseFormById(id: string): Observable<Form> {
     return this.http.get<Form>(this.url + 'public/form/' + id);
   }
 
-  generateForm(promptText : string): Observable<any> {
-    return this.http.post(this.url + 'ai/generateForm', {
-      prompt : promptText
+   
+  generateForm(promptText: string): Observable<any> {
+    return this.http.post(this.url + 'user/form/generate', {
+      prompt: promptText
     });
   }
 
@@ -125,8 +129,8 @@ export class FormService {
   getAllForms(): Observable<Form[]> {
     return this.http.get<Form[]>(this.url + 'user/allForm');
   }
-  
-  getFormByStatus() {}
+
+  getFormByStatus() { }
 
   submitResponse(formId: string, rawValue: any) {
     const formData = this.mapToFormData(formId, rawValue);
@@ -171,47 +175,47 @@ export class FormService {
     return this.http.get(this.url + 'user/access/' + form_id);
   }
 
-getUsernameByEmail(email: string) {
-  return this.http.get(`${this.url}user/username-by-email`, {
-    params: { email: email },
-    responseType: 'text'   // 🔥 important
-  });
-}
+  getUsernameByEmail(email: string) {
+    return this.http.get(`${this.url}user/username-by-email`, {
+      params: { email: email },
+      responseType: 'text'   // 🔥 important
+    });
+  }
 
-getSharedForms(){
-  return this.http.get(this.url + 'user/shared-forms');
-}
-
-
-// Version Cpntrol APIs
- 
-getAllVersions(formId: string){
-  return this.http.get(this.url + 'user/version/' + formId);
-}
-
-switchVersion(formId: string, versionId: number) {
-  const url = `${this.url}user/version/switch/${formId}`;
-
-  const body = {
-    versionId: versionId
-  };
-
-  return this.http.patch(url, body, { responseType: 'text' });
-}
+  getSharedForms() {
+    return this.http.get(this.url + 'user/shared-forms');
+  }
 
 
-deleteAllVersions(formId: string) {
-  return this.http.patch(
-    `${this.url}user/version/delete/${formId}`,
-    {} , {responseType: 'text'}
-  );
-}
-  createGroup(data : any) {
+  // Version Cpntrol APIs
+
+  getAllVersions(formId: string) {
+    return this.http.get(this.url + 'user/version/' + formId);
+  }
+
+  switchVersion(formId: string, versionId: number) {
+    const url = `${this.url}user/version/switch/${formId}`;
+
+    const body = {
+      versionId: versionId
+    };
+
+    return this.http.patch(url, body, { responseType: 'text' });
+  }
+
+
+  deleteAllVersions(formId: string) {
+    return this.http.patch(
+      `${this.url}user/version/delete/${formId}`,
+      {}, { responseType: 'text' }
+    );
+  }
+  createGroup(data: any) {
     return this.http.post(this.url + 'group/createGroup', data);
   }
 
   getMyGroups() {
-    return this.http.get(this. url + 'group/myGroups');
+    return this.http.get(this.url + 'group/myGroups');
   }
 
   addMembersToGroup(groupId : string, members : string[]) {

@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogRef,
@@ -8,15 +8,18 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatTabsModule } from '@angular/material/tabs';
+import { ConditionalLogic } from '../../components/conditional-logic/conditional-logic';
+import { FieldQuizConfig } from '../../components/field-quiz-config/field-quiz-config';
 
 @Component({
   selector: 'app-edit-field',
-  imports: [CommonModule, FormsModule, MatDialogContent, MatDialogActions, MatTabsModule],
+  imports: [CommonModule, FormsModule, MatDialogContent, MatDialogActions, MatTabsModule, ConditionalLogic, FieldQuizConfig],
   templateUrl: './edit-field.html',
   styleUrl: './edit-field.css',
 })
 export class EditField {
   field: any;
+  isQuizMode: boolean = false;
 
   validationOptions: any[] = [];
 
@@ -25,9 +28,16 @@ export class EditField {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     private dialogRef: MatDialogRef<EditField>,
-  ) {
-    this.field = data;
-    this.setValidationOptions();
+    private cd: ChangeDetectorRef
+  ) {}
+
+  ngOnInit() {
+    if (this.data) {
+      this.field = { ...this.data.field };
+      this.isQuizMode = !!this.data.isQuizMode;
+      this.setValidationOptions();
+    }
+    this.cd.detectChanges();
   }
 
   setValidationOptions() {
@@ -101,6 +111,23 @@ export class EditField {
       option.value = option.value.filter((t: string) => t !== type);
     }
   }
+
+  get isLogicInvalid(): boolean {
+    const logic = this.field.fieldLogic;
+    if (!logic || !logic.enabled) return false;
+
+    // Return true (invalid) if enabled but missing fields
+    return !logic.sourceFieldId || !logic.operator || !logic.value;
+  }
+
+  onLogicChange(logicData: any) {
+    if (logicData) {
+      this.field.fieldLogic = { ...logicData };
+    } else {
+      delete this.field.fieldLogic;
+    }
+  }
+
   save() {
     const validations: any = {};
 
@@ -114,9 +141,16 @@ export class EditField {
       }
     });
 
-    this.field.validations = validations;
+    console.log(this.field.quizConfig);
 
-    this.dialogRef.close({ ...this.field });
+    const finalPayload = {
+      ...this.field,
+      validations: validations,
+      quizConfig: {...this.field.quizConfig}
+    };
+
+    this.dialogRef.close(finalPayload);
+    console.log(finalPayload);
   }
 
   cancel() {
