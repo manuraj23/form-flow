@@ -67,9 +67,12 @@
         <span>{{ group.groupName }}</span>
         <span>{{ group.maxMembers }}</span>
         <span>{{ group.createdAt | date:'dd MMM yyyy' }}</span>
-        <span>
-          <button class="icon-btn">
+        <span class="action-buttons">
+          <button class="icon-btn" (click)="toggleGroupDetails(group); $event.stopPropagation()">
             <mat-icon>visibility</mat-icon>
+          </button>
+          <button class="icon-btn" (click)="openEditGroupDialog(group); $event.stopPropagation()">
+            <mat-icon>edit</mat-icon>
           </button>
         </span>
       </div>
@@ -108,82 +111,152 @@
 
 
       <div class="member-actions">
-        <button class="btn-outline">Add Admin</button>
-        <button class="btn-primary">+ Add Member</button>
+        <button class="btn-outline" (click)="showAddAdminInput = true">Add Admin</button>
+        <button class="btn-primary" (click)="showAddMemberInput = true">+ Add Member</button>
       </div>
     </div>
 
     <!-- Table -->
     <div class="table">
 
-      <div class="table-row header-row">
+      <div *ngIf="showAddMemberInput" class="table-row add-member-row">
+        <span colspan="4">
+          <input 
+            type="text"
+            placeholder="Enter emails (comma separated)"
+            [(ngModel)]="newMemberInput"
+          />
+        </span>
+
+        <span>
+          <button class="btn-primary" (click)="addMembers()">Add</button>
+          <button class="btn-outline" (click)="cancelAddMember()">Cancel</button>
+        </span>
+      </div>
+
+      <div *ngIf="showAddAdminInput" class="table-row add-member-row">
+        <span colspan="4">
+          <input 
+            type="text"
+            placeholder="Enter admin emails (comma separated)"
+            [(ngModel)]="newAdminInput"
+          />
+        </span>
+
+        <span>
+          <button class="btn-primary" (click)="addAdmins()">Add</button>
+          <button class="btn-outline" (click)="cancelAddAdmin()">Cancel</button>
+        </span>
+      </div>
+
+      <div class="table-row header-row member-table-row">
         <span>User</span>
         <span>Role</span>
-        <span>Joined</span>
         <span>Actions</span>
       </div>
 
-      <!-- Member 1 -->
-      <div class="table-row">
+      <div *ngIf="members.length === 0" class="no-data">
+        No members in this group
+      </div>
+
+      <div class="table-row member-table-row" *ngFor="let member of members">
         <span class="user">
           <mat-icon>person</mat-icon>
-          Het Naik
+          {{ member.username }}
         </span>
 
         <span>
-          <span class="role admin">ADMIN</span>
+          <span class="role" [ngClass]="member.role?.toLowerCase()">
+            {{ member.role }}
+          </span>
         </span>
 
-        <span>2 months ago</span>
-
         <span>
-          <button class="icon-btn">
-            <mat-icon>edit</mat-icon>
+          <button class="icon-btn" (click)="removeMember(member)">
+            <mat-icon>delete</mat-icon>
           </button>
         </span>
       </div>
-
-      <!-- Member 2 -->
-      <div class="table-row">
-        <span class="user">
-          <mat-icon>person</mat-icon>
-          Rohit
-        </span>
-
-        <span>
-          <span class="role member">MEMBER</span>
-        </span>
-
-        <span>1 month ago</span>
-
-        <span>
-          <button class="icon-btn">
-            <mat-icon>edit</mat-icon>
-          </button>
-        </span>
-      </div>
-
-      <!-- Member 3 -->
-      <div class="table-row">
-        <span class="user">
-          <mat-icon>person</mat-icon>
-          Hardik
-        </span>
-
-        <span>
-          <span class="role member">MEMBER</span>
-        </span>
-
-        <span>3 weeks ago</span>
-
-        <span>
-          <button class="icon-btn">
-            <mat-icon>edit</mat-icon>
-          </button>
-        </span>
-      </div>
+      
 
     </div>
+  </div>
+
+</div>
+
+<ng-template #confirmDialog let-data>
+  <div class="dialog-container">
+    <h3>Confirm Action</h3>
+    <p>{{ data.message }}</p>
+
+    <div class="dialog-actions">
+      <button class="btn-outline" (click)="dialogRef.close(false)">Cancel</button>
+      <button class="btn-primary" (click)="dialogRef.close(true)">Delete</button>
+    </div>
+  </div>
+</ng-template>
+
+<div class="sidebar" [class.open]="isSidebarOpen" *ngIf="selectedGroupDetails">
+
+  <!-- Header -->
+  <div class="sidebar-header">
+    <h2>{{ selectedGroupDetails.groupName }}</h2>
+    <button (click)="isSidebarOpen = false">✖</button>
+  </div>
+
+  <!-- Image -->
+  <div class="sidebar-image-wrapper" *ngIf="selectedGroupDetails.imageUrl">
+    <img [src]="selectedGroupDetails.imageUrl" />
+  </div>
+
+  <!-- Info Section -->
+  <div class="sidebar-section">
+    <h4>Group Info</h4>
+
+    <div class="info-row">
+      <span>Owner</span>
+      <strong>{{ selectedGroupDetails.ownerUsername }}</strong>
+    </div>
+
+    <div class="info-row">
+      <span>Created</span>
+      <strong>{{ selectedGroupDetails.createdAt | date:'dd MMM yyyy' }}</strong>
+    </div>
+
+    <div class="info-row">
+      <span>Max Members</span>
+      <strong>{{ selectedGroupDetails.maxMembers }}</strong>
+    </div>
+
+    <div class="info-row">
+      <span>Total Members</span>
+      <strong>{{ members.length }}</strong>
+    </div>
+  </div>
+
+  <!-- Description -->
+  <div class="sidebar-section">
+    <h4>Description</h4>
+    <p class="description">
+      {{ selectedGroupDetails.description || 'No description provided' }}
+    </p>
+  </div>
+
+  <!-- Admins -->
+  <div class="sidebar-section">
+    <h4>Admins</h4>
+
+    <div class="admin-list">
+      <ng-container *ngFor="let m of members">
+        <span class="admin-badge" *ngIf="m.role === 'ADMIN'">
+          {{ m.username }}
+        </span>
+      </ng-container>
+    </div>
+
+    <p *ngIf="!members.some(m => m.role === 'ADMIN')" class="no-admin">
+      No admins assigned
+    </p>
   </div>
 
 </div>

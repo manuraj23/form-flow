@@ -46,7 +46,7 @@ export class GenerateFormDialog implements OnDestroy {
       .subscribe(() => this.handleClose());
   }
 
-  /*
+
   onGenerate(): void {
     if (!this.prompt().trim() || this.loading()) return;
 
@@ -80,37 +80,7 @@ export class GenerateFormDialog implements OnDestroy {
         }
       });
   }
-*/
 
-  onGenerate(): void {
-    if (!this.prompt().trim() || this.loading()) return;
-
-    this.loading.set(true);
-
-    // Simulate API delay (10 seconds)
-    setTimeout(() => {
-      const isSuccess = Math.random() > 0.5; // 50-50 success/failure
-
-      if (isSuccess) {
-        const fakeFormId = Math.floor(Math.random() * 1000) + 1;
-
-        this.snackBar.open('Form generated successfully!', 'Close', {
-          duration: 3000,
-          panelClass: ['snack-success'],
-        });
-
-        this.dialogRef.close();
-        this.router.navigate(['/edit-form', fakeFormId]);
-      } else {
-        this.loading.set(false);
-
-        this.snackBar.open('Generation failed. Please try again.', 'Close', {
-          duration: 4000,
-          panelClass: ['snack-error'],
-        });
-      }
-    }, 5000); // ⏳  5 seconds delay
-  }
   onCancel(): void {
     this.handleClose();
   }

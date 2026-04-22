@@ -5,12 +5,13 @@ import { Observable, of } from 'rxjs';
 import { ThemeService } from './theme-service';
 import { ChartData } from '../interfaces/chart-data-response-schema';
 import { FormResponseData } from '../interfaces/form-response-schema';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FormService {
-  url = 'http://localhost:8082/formflow/';
+  url = environment.backendUrl;
 
   constructor(
     private http: HttpClient,
@@ -109,10 +110,13 @@ export class FormService {
     return this.http.get<Form>(this.url + 'public/form/' + id);
   }
 
-  generateForm(promptText: string): Observable<any> {
-    return this.http.post(this.url + 'user/form/generate', {
-      prompt: promptText
-    });
+  generateForm(promptText : string): Observable<any> {
+    return this.http.post(this.url + 'ai/generateForm', {
+      prompt : promptText
+//   generateForm(promptText: string): Observable<any> {
+//     return this.http.post(this.url + 'user/form/generate', {
+//       prompt: promptText
+//     });
   }
 
   getUniqueAssigneesByFormId(id: string): Observable<ChartData> {
@@ -213,6 +217,34 @@ export class FormService {
 
   getMyGroups() {
     return this.http.get(this.url + 'group/myGroups');
+  }
+
+  addMembersToGroup(groupId : string, members : string[]) {
+    return this.http.post(`${this.url}group/${groupId}/addMembers`, members, {responseType: 'text'});
+  }
+
+  getGroupMembers(groupId : string) {
+    return this.http.get(`${this.url}group/${groupId}/members`);
+  }
+
+  removeUsersFromGroup(groupId : string, users : string[]) {
+    return this.http.post(this.url + `group/${groupId}/removeUsers`, users, {responseType: 'text'});
+  }
+
+  addAdminsToGroup(groupId : string, emails : string[]) {
+    return this.http.post(this.url + `group/${groupId}/addAdmins`, emails, {responseType: 'text'});
+  }
+
+  getGroupAdmins(groupId : string) {
+    return this.http.get(this.url + `group/${groupId}/admins`);
+  }
+
+  updateGroup(groupId : string, data : any) {
+    return this.http.put(this.url + 'group/' + groupId + '/update', data, {responseType: 'text'});
+  }
+
+  assignFormToGroup(groupId : string, formId : string) {
+    return this.http.post(this.url + `group/${groupId}/assignForm/${formId}`, {});
   }
 
 }

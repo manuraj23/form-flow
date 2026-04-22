@@ -2,20 +2,21 @@ import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:8082/formflow/auth';
-  private oAuthurl = 'http://localhost:8082/formflow/oauth2/authorization'
+  private baseUrl = environment.backendUrl + 'auth';
+  private oAuthurl = environment.backendUrl + 'oauth2/authorization';
 
   isLoggedIn = signal(false);
 
   constructor(
     private http: HttpClient,
     private router: Router,
-  ) { }
+  ) {}
 
   verifyOtp(email: string, otp: string): Observable<any> {
     return this.http
@@ -31,13 +32,11 @@ export class AuthService {
       );
   }
   resendOtp(data: string) {
-    return this.http
-      .post(`${this.baseUrl}/resendOtpVerifyaccount`, data)
-      .pipe(
-        tap((res: any) => {
-          console.log('OTP Re-sent');
-        }),
-      );
+    return this.http.post(`${this.baseUrl}/resendOtpVerifyaccount`, data).pipe(
+      tap((res: any) => {
+        console.log('OTP Re-sent');
+      }),
+    );
   }
   sendOtp(data: string) {
     return this.http
@@ -73,9 +72,7 @@ export class AuthService {
   }
 
   checkUsernameAailability(data: string) {
-    return this.http.post(`${this.baseUrl}/usernameCheck`, data).pipe(
-      tap((res: any) => { }),
-    );
+    return this.http.post(`${this.baseUrl}/usernameCheck`, data).pipe(tap((res: any) => {}));
   }
 
   getAccessToken(): string | null {
@@ -97,10 +94,14 @@ export class AuthService {
   clearTokens() {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
+    this.isLoggedIn.set(false);
   }
 
   checkAuthStatus() {
-    const token = this.getAccessToken();
+    let token = this.getAccessToken();
+
+    if(!token) token = this.getRefreshToken();
+
     this.isLoggedIn.set(!!token);
   }
 
@@ -155,7 +156,7 @@ export class AuthService {
       next: () => {
         console.log('logged out successfully !');
       },
-      error: () => { },
+      error: () => {},
     });
 
     this.clearTokens();
@@ -175,6 +176,7 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/refresh`, { refreshToken }).pipe(
       tap((res: any) => {
         this.setTokens(res.accessToken, res.refreshToken);
+        this.isLoggedIn.set(true); // ✅ ADD THIS
       }),
     );
   }

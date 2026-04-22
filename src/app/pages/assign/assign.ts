@@ -38,6 +38,8 @@ export class Assign {
   editorCount: number = 0;
   responderCount: number = 0;
   viewerCount: number = 0;
+  searchedGroups: any[]= [];
+  allGroups: any[] = [];
 
   
 
@@ -72,6 +74,13 @@ export class Assign {
         this.recipients = [];
       }
     });
+
+    this.formService.getMyGroups().subscribe({
+      next: (res: any) => {
+        this.allGroups = res.groups || [];
+      },
+      error: () => {}
+    });
   }
 
   filteredRecipients() {
@@ -89,10 +98,20 @@ export class Assign {
   }
 
   assignForm() {
-     if (this.selectedCount === 0) {
+    const selectedGroups = this.searchedGroups.filter(g => g.selected);
+    if (this.selectedCount === 0 && selectedGroups.length === 0) {
     this.toastr.error('Please select at least one recipient.');
     return;
   }
+
+  selectedGroups.forEach(g => {
+    this.formService.assignFormToGroup(g.groupId, this.formId).subscribe({
+      next: () => {},
+      error: () => {
+        this.toastr.error(`Error assigning to group ${g.groupName}`);
+      }
+    });
+  });
 
   const editor: String[] = [];
   const responder: String[] = [];
@@ -140,23 +159,50 @@ export class Assign {
   }
 
 
- searchUser() {
+search() {
   if (!this.searchText) return;
- console.log("Searching for:", this.searchText);
-  this.formService.getUsernameByEmail(this.searchText).subscribe({
-    next: (res: any) => {
-      if(res===this.form.createdBy){
-        this.toastr.warning('Form creator cannot be added ');
+
+  const isEmail = this.searchText.includes('@');
+
+  if (isEmail) {
+    this.searchedGroups = [];
+    this.formService.getUsernameByEmail(this.searchText).subscribe({
+      next: (res: any) => {
+        if (res === this.form.createdBy) {
+          this.toastr.warning('Form creator cannot be added');
+          return;
+        }
+        this.searchedUser = res;
+      },
+      error: () => {
+        this.toastr.error('User not found');
+        this.searchedUser = null;
+      }
+    });
+  } else {
+    this.searchedUser = null;
+    const match = this.allGroups.find(g =>
+      g.groupName.toLowerCase() === this.searchText.toLowerCase()
+    );
+
+    if (match) {
+      const exists = this.searchedGroups.some(g => g.groupId === match.groupId);
+
+      if (exists) {
+        this.toastr.warning('Group already added');
         return;
       }
-      console.log(res);
-      this.searchedUser = res;  // JSON case
-    },
-    error: () => {
-      this.toastr.error('User not found');
-      this.searchedUser = null;
+
+      this.searchedGroups.push({
+        ...match,
+        selected: true,
+        role: 'Respondent'
+      });
+
+    } else {
+      this.toastr.error('Group not found');
     }
-  });
+  }
 }
 
 addRecipient() {

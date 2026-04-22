@@ -8,7 +8,8 @@
     <input 
       type="text"
       placeholder="Enter group name"
-      [(ngModel)]="groupName" />
+      [(ngModel)]="groupName"
+      [disabled]="isEditMode" />
   </div>
 
   <!-- Description -->
@@ -49,7 +50,7 @@
   <!-- Actions -->
   <div class="actions">
     <button class="btn-outline" (click)="close()">Cancel</button>
-    <button class="btn-primary create-btn" (click)="createGroup()">Create</button>
+    <button class="btn-primary create-btn" (click)="createOrUpdateGroup()">{{ isEditMode ? 'Save Changes' : 'Create' }}</button>
   </div>
 
 </div>
