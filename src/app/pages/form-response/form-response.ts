@@ -299,7 +299,7 @@ export class FormResponse implements OnInit, AfterViewInit, OnDestroy {
       plugins: [
         {
           id: 'centerText',
-          afterDraw: (chart) => {
+          afterDraw: (chart: any) => {
             const {
               ctx: c,
               chartArea: { width, height, left, top },

@@ -40,4 +40,16 @@ export class BuilderCheckBox {
   removeOption(index : number) {
     this.bluePrint.options?.splice(index, 1);
   }
+
+  
+  isOptionCorrect(optionValue: string): boolean {
+    const config = this.fieldData?.quizConfig;
+    if (!config?.isScored || !config?.correctAnswer) return false;
+
+    if (Array.isArray(config.correctAnswer)) {
+      return config.correctAnswer.includes(optionValue);
+    }
+
+    return config.correctAnswer === optionValue;
+  }
 }

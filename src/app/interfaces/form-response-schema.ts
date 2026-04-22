@@ -3,4 +3,5 @@ export interface FormResponseData {
   form: any;
   response: Record<string, any>;
   submittedAt: Date;
+  submittedBy: string;
 }

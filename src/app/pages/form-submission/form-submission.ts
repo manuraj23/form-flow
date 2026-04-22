@@ -54,6 +54,9 @@ export class FormSubmission {
   isClosed: boolean = false;
   responseCount: any;
   isFormReady: boolean = false;
+  showReview = false;
+  quizResult: any = null;
+  showScore: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -72,6 +75,7 @@ export class FormSubmission {
       this.formStructure = this.dialogData;
       this.isReadOnly = this.dialogData.isReadOnly;
       this.buildReactiveForm();
+      this.setupConditionalLogic();
     }
     //Response Mode
     else {
@@ -80,6 +84,7 @@ export class FormSubmission {
         this.formService.getResponseFormById(formId).subscribe({
           next: (form: Form) => {
             this.formStructure = form;
+            console.log(this.formStructure);
             // if (localStorage.getItem('prevTheme') === null) {
             //   localStorage.setItem('prevTheme', localStorage.getItem('theme') || 'theme-pink');
             // }
@@ -91,6 +96,7 @@ export class FormSubmission {
               if (this.checkAvailability(form)) {
                 this.handleTheme(form);
                 this.buildReactiveForm();
+                this.setupConditionalLogic();
                 this.isFormReady = true;
                 this.loadDraft(formId);
                 this.setupDraftTimer(formId);
@@ -98,7 +104,7 @@ export class FormSubmission {
                 this.isClosed = true;
                 this.isFormReady = true;
               }
-               this.cd.detectChanges();
+              this.cd.detectChanges();
             });
           },
           error: (err) => {
@@ -199,6 +205,56 @@ export class FormSubmission {
     this.cd.detectChanges();
   }
 
+  setupConditionalLogic() {
+    this.evaluateAllVisibility();
+
+    this.formGroup.valueChanges.subscribe(() => {
+      this.evaluateAllVisibility();
+    });
+  }
+
+  evaluateAllVisibility() {
+    this.formStructure.sections.forEach((section: any) => {
+      section.fields.forEach((field: any) => {
+        const control = this.formGroup.get(field.id);
+        if (control) {
+          if (this.isFieldVisible(field)) {
+            control.enable({ emitEvent: false });
+          } else {
+            control.disable({ emitEvent: false });
+          }
+        }
+      });
+    });
+    this.cd.detectChanges();
+  }
+
+  isFieldVisible(field: any): boolean {
+    const logic = field.fieldLogic;
+    if (!logic || !logic.enabled) return true;
+
+    const sourceValue = this.formGroup.get(logic.sourceFieldId)?.value;
+
+    let isMatch = false;
+    if (Array.isArray(sourceValue)) {
+      // For Checkbox
+      isMatch = sourceValue.includes(logic.value);
+    } else {
+      // For Radio/Dropdown
+      isMatch = String(sourceValue ?? '') === String(logic.value ?? '');
+    }
+    if (logic.operator === 'NOT_EQUALS') {
+      isMatch = !isMatch;
+    }
+
+    return logic.action === 'SHOW' ? isMatch : !isMatch;
+  }
+
+  isSectionVisible(section: any): boolean {
+    if (!section.fields || section.fields.length === 0) return false;
+    return section.fields.some((field: any) => this.isFieldVisible(field));
+  }
+
   setupDraftTimer(formId: string) {
     this.formGroup.valueChanges.subscribe(values => {
       localStorage.setItem(`form_draft_${formId}`, JSON.stringify(values));
@@ -218,49 +274,64 @@ export class FormSubmission {
       this.toastr.warning('This is a preview. Data is not saved to the database.');
       return;
     }
-
     if (this.formGroup.valid) {
       this.isSubmitting = true;
 
-      // const submissionData = {
-      //   submittedBy: this.authService.getCurrentUser()
-      // }
+      this.formService.submitResponse(
+        this.formStructure.id,
+        this.formGroup.value
+      ).subscribe({
 
-      this.formService.submitResponse(this.formStructure.id, this.formGroup.value).subscribe({
-        next: (res) => {
+        next: (res: any) => {
           console.log(res);
+
           this.toastr.success('Response saved successfully!');
+
+          this.quizResult = res;
+
+          this.showScore =
+            this.formStructure?.settings?.isQuizMode &&
+            this.formStructure?.settings?.showScore;
+            console.log(this.showScore);
+
           this.formGroup.reset();
           this.isSubmitting = false;
           this.isSubmitted = true;
+
           localStorage.removeItem(`form_draft_${this.formStructure.id}`);
         },
+
         error: (err) => {
-          console.error('Submission failed', err);
-          this.toastr.error('Could not save response. Please try again.');
+          console.error(err);
+          this.toastr.error('Could not save response.');
           this.isSubmitting = false;
-        },
+        }
+
       });
+
     } else {
       this.formGroup.markAllAsTouched();
       this.toastr.error('Please fix the errors before submitting.');
     }
   }
 
+  // toggleReview() {
+  //   this.showReview = !this.showReview;
+  // }
+
   get currentUser(): string | null {
     return this.authService.getCurrentUser();
   }
 
   get isLoggedIn(): boolean {
-  return this.authService.isLoggedIn();
-}
+    return this.authService.isLoggedIn();
+  }
 
   resetForm() {
     this.isSubmitted = false;
     this.isSubmitting = false;
     this.ngOnInit();
   }
-
 
   logoutAndSwitch() {
     this.authService.logout();

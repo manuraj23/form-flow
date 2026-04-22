@@ -8,83 +8,139 @@
     </div>
 
     @if (isSubmitted) {
+    @if(showScore){
     <div class="text-center p-20 bg-container shadow-xl border border-theme">
-      <h1 class="text-3xl font-bold text-primary mb-2">Thank You!</h1>
-      <p class="text-muted mb-8">Your response has been successfully recorded.</p>
-      <button (click)="resetForm()" class="btn-primary px-6 py-2 rounded-xl font-bold">
-        SUBMIT ANOTHER RESPONSE
-      </button>
-    </div>
-    }
+      <h1 class="text-4xl font-black text-primary">Score: {{ quizResult.score }} /
+        {{quizResult.evaluation.maxScore}}</h1>
+      <p class="text-muted mt-2">Submitted on {{ quizResult.submittedAt | date:'medium' }}</p>
+      </div>
+      }
 
-    @else if (formStructure?.settings?.isPrivate && !isLoggedIn) {
-    <div class="text-center p-20 bg-container border border-theme">
-      <mat-icon class="text-6xl text-amber-500 mb-4">lock</mat-icon>
-      <h2 class="text-2xl font-bold mb-2">Private Form</h2>
-      <p class="text-muted mb-6">This form is restricted to registered users. Please log in to continue.</p>
-      <button (click)="logoutAndSwitch()" class="btn-primary px-8 py-3 rounded-xl font-bold">
-        LOG IN TO ACCESS
-      </button>
-    </div>
-    }
-
-    @else if (isClosed) {
-    <div class="text-center p-20 bg-container border border-theme">
-      <mat-icon class="text-6xl text-red-500 mb-4">event_busy</mat-icon>
-      <h2 class="text-2xl font-bold mb-2">Form Unavailable</h2>
-      <p class="text-muted">{{ closeMessage }}</p>
-    </div>
-    }
-
-    @else {
-    @if (formStructure?.settings?.isPrivate) {
-    <div class=" p-4 flex justify-between items-center border-b">
-      <span class="text-sm">Logged in as: <strong>{{ currentUser }}</strong></span>
-      <button mat-button color="warn" (click)="logoutAndSwitch()">Switch Account</button>
-    </div>
-    }
-
-    <form [formGroup]="formGroup" (ngSubmit)="submitResponse()" class="p-10">
-      <div *ngFor="let section of formStructure?.sections" class="mb-12">
-        <h2 class="text-xl font-bold text-primary mb-6 border-b pb-2 border-theme">
-          {{ section.sectionTitle }}
-        </h2>
-
-        <div *ngFor="let field of section.fields" class="mb-8">
-          <label class="block text-sm font-bold text-muted uppercase tracking-wider mb-2"
-            [ngStyle]="getFieldStyle(field.fieldStyle)">
-            {{ field.fieldConfig?.label}}
-            <span *ngIf="field.fieldConfig.validations.required" class="text-red-500">*</span>
-          </label>
-
-          <div [ngSwitch]="field.fieldType">
-            <app-input-text *ngSwitchCase="'TEXT'" [fieldConfig]="field.fieldConfig"
-              [control]="getControl(field)"></app-input-text>
-            <app-check-box *ngSwitchCase="'CHECKBOX'" [fieldConfig]="field.fieldConfig"
-              [control]="getControl(field)"></app-check-box>
-            <app-file-upload *ngSwitchCase="'FILE'" [fieldConfig]="field.fieldConfig"
-              [control]="getControl(field)"></app-file-upload>
-            <app-radio-button *ngSwitchCase="'RADIO'" [fieldConfig]="field.fieldConfig"
-              [control]="getControl(field)"></app-radio-button>
-            <app-select-card *ngSwitchCase="'DROPDOWN'" [fieldConfig]="field.fieldConfig"
-              [control]="getControl(field)"></app-select-card>
-            <app-textarea *ngSwitchCase="'TEXTAREA'" [fieldConfig]="field.fieldConfig "
-              [control]="getControl(field)"></app-textarea>
-          </div>
-
-          <!-- <div *ngIf="formGroup.get(field.id)?.invalid && formGroup.get(field.id || field.fieldOrder)?.touched"
-            class="text-red-500 text-xs mt-2 italic flex items-center gap-1">
-            <mat-icon class="text-sm scale-75">error_outline</mat-icon>
-            This field is required or formatted incorrectly.
-          </div> -->
-        </div>
+      <!-- <div class="flex gap-4 justify-center mt-8">
+        <button (click)="toggleReview()" class="btn-primary px-6 py-2 rounded-xl font-bold shadow-lg">
+          {{ showReview ? 'HIDE ANSWERS' : 'VIEW ANSWERS' }}
+        </button>
       </div>
 
-      <button type="submit" [disabled]="formGroup.invalid"
-        class="w-full btn-primary font-bold py-4 rounded-2xl transition-all shadow-lg opacity-90 hover:opacity-100 cursor-pointer disabled:opacity-50 disabled:grayscale">
-        SUBMIT RESPONSE
-      </button>
-    </form>
-    }
+      @if (showReview) {
+      <div class="mt-8 space-y-6 animate-in slide-in-from-top duration-500">
+        <h3 class="text-xl font-bold text-primary border-b pb-2 border-theme">Review Your Answers</h3>
+
+        <div *ngFor="let section of formStructure?.sections">
+          <div *ngFor="let field of section.fields" class="mb-6">
+
+            <div class="p-5 rounded-2xl border bg-surface flex flex-col gap-3"
+              [class.border-green-500]="quizResult.evaluation[field.id]?.correct"
+              [class.border-red-400]="!quizResult.evaluation[field.id]?.correct">
+
+              <div class="flex justify-between items-start">
+                <span class="font-bold text-sm text-primary">{{ field.fieldConfig?.label }}</span>
+                <mat-icon [class.text-green-500]="quizResult.evaluation[field.id]?.correct"
+                  [class.text-red-500]="!quizResult.evaluation[field.id]?.correct">
+                  {{ quizResult.evaluation[field.id]?.correct ? 'check_circle' : 'cancel' }}
+                </mat-icon>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4 text-xs">
+                <div class="p-3 bg-container rounded-lg">
+                  <p class="text-muted uppercase font-bold mb-1">Your Answer</p>
+                  <p class="font-bold" [class.text-red-500]="!quizResult.evaluation[field.id]?.correct">
+                    {{ quizResult.response[field.id] || 'No Response' }}
+                  </p>
+                </div>
+
+                @if (!quizResult.evaluation[field.id]?.correct) {
+                <div class="p-3 bg-green-50 rounded-lg">
+                  <p class="text-green-700 uppercase font-bold mb-1">Correct Answer</p>
+                  <p class="font-bold text-green-800">
+                    {{ quizResult.evaluation[field.id]?.correctAnswer }}
+                  </p>
+                </div>
+                }
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      }
+    </div> -->
+      @else{
+      <div class="text-center p-20 bg-container shadow-xl border border-theme">
+        <h1 class="text-3xl font-bold text-primary mb-2">Thank You!</h1>
+        <p class="text-muted mb-8">Your response has been successfully recorded.</p>
+        <button (click)="resetForm()" class="btn-primary px-6 py-2 rounded-xl font-bold">
+          SUBMIT ANOTHER RESPONSE
+        </button>
+      </div>
+      }
+      }
+
+      @else if (formStructure?.settings?.isPrivate && !isLoggedIn) {
+      <div class="text-center p-20 bg-container border border-theme">
+        <mat-icon class="text-6xl text-amber-500 mb-4">lock</mat-icon>
+        <h2 class="text-2xl font-bold mb-2">Private Form</h2>
+        <p class="text-muted mb-6">This form is restricted to registered users. Please log in to continue.</p>
+        <button (click)="logoutAndSwitch()" class="btn-primary px-8 py-3 rounded-xl font-bold">
+          LOG IN TO ACCESS
+        </button>
+      </div>
+      }
+
+      @else if (isClosed) {
+      <div class="text-center p-20 bg-container border border-theme">
+        <mat-icon class="text-6xl text-red-500 mb-4">event_busy</mat-icon>
+        <h2 class="text-2xl font-bold mb-2">Form Unavailable</h2>
+        <p class="text-muted">{{ closeMessage }}</p>
+      </div>
+      }
+
+      @else {
+      @if (formStructure?.settings?.isPrivate) {
+      <div class=" p-4 flex justify-between items-center border-b">
+        <span class="text-sm">Logged in as: <strong>{{ currentUser }}</strong></span>
+        <button mat-button color="primary" class="cursor-pointer" (click)="logoutAndSwitch()">Switch Account</button>
+      </div>
+      }
+
+      <form [formGroup]="formGroup" (ngSubmit)="submitResponse()" class="p-10">
+        <div *ngFor="let section of formStructure?.sections" class="mb-12">
+          @if (isSectionVisible(section)) {
+          <h2 class="text-xl font-bold text-primary mb-6 border-b pb-2 border-theme">
+            {{ section.sectionTitle }}
+          </h2>
+
+          <div *ngFor="let field of section.fields" class="mb-8">
+            @if (isFieldVisible(field)) {
+            <label class="block text-sm font-bold text-muted uppercase tracking-wider mb-2"
+              [ngStyle]="getFieldStyle(field.fieldStyle)">
+              {{ field.fieldConfig?.label}}
+              <span *ngIf="field.fieldConfig?.validations?.required" class="text-red-500">*</span>
+            </label>
+
+            <div [ngSwitch]="field.fieldType">
+              <app-input-text *ngSwitchCase="'TEXT'" [fieldConfig]="field.fieldConfig"
+                [control]="getControl(field)"></app-input-text>
+              <app-check-box *ngSwitchCase="'CHECKBOX'" [fieldConfig]="field.fieldConfig"
+                [control]="getControl(field)"></app-check-box>
+              <app-file-upload *ngSwitchCase="'FILE'" [fieldConfig]="field.fieldConfig"
+                [control]="getControl(field)"></app-file-upload>
+              <app-radio-button *ngSwitchCase="'RADIO'" [fieldConfig]="field.fieldConfig"
+                [control]="getControl(field)"></app-radio-button>
+              <app-select-card *ngSwitchCase="'DROPDOWN'" [fieldConfig]="field.fieldConfig"
+                [control]="getControl(field)"></app-select-card>
+              <app-textarea *ngSwitchCase="'TEXTAREA'" [fieldConfig]="field.fieldConfig "
+                [control]="getControl(field)"></app-textarea>
+            </div>
+            }
+          </div>
+          }
+        </div>
+        <button type="submit" [disabled]="formGroup.invalid"
+          class="w-full btn-primary font-bold py-4 rounded-2xl transition-all shadow-lg opacity-90 hover:opacity-100 cursor-pointer disabled:opacity-50 disabled:grayscale">
+          SUBMIT RESPONSE
+        </button>
+      </form>
+      }
+    </div>
   </div>
-</div>
