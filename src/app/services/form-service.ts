@@ -6,6 +6,7 @@ import { ThemeService } from './theme-service';
 import { ChartData } from '../interfaces/chart-data-response-schema';
 import { FormResponseData } from '../interfaces/form-response-schema';
 import { environment } from '../../environments/environment';
+import { Template } from '../interfaces/formTemplate';
 
 @Injectable({
   providedIn: 'root',
@@ -241,6 +242,23 @@ deleteAllVersions(formId: string) {
     return this.http.post(this.url + `group/${groupId}/assignForm/${formId}`, {});
   }
 
+
+
+  getAllTemplates(): Observable<Template[]> {
+    return this.http.get<Template[]>(this.url + 'user/templates');
+  }
+
+  getTemplateById(templateId: string) {
+    return this.http.get(this.url + 'user/templates/' + templateId);
+  }
+
+  // template.service.ts
+useTemplate(templateId: string) {
+  return this.http.post<any>(
+    this.url + 'user/templates/' + templateId + '/use',
+    {}
+  );
+}
 }
 
 
