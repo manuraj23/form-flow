@@ -110,13 +110,11 @@ export class FormService {
     return this.http.get<Form>(this.url + 'public/form/' + id);
   }
 
-  generateForm(promptText : string): Observable<any> {
-    return this.http.post(this.url + 'ai/generateForm', {
-      prompt : promptText
-//   generateForm(promptText: string): Observable<any> {
-//     return this.http.post(this.url + 'user/form/generate', {
-//       prompt: promptText
-//     });
+   
+  generateForm(promptText: string): Observable<any> {
+    return this.http.post(this.url + 'user/form/generate', {
+      prompt: promptText
+    });
   }
 
   getUniqueAssigneesByFormId(id: string): Observable<ChartData> {
