@@ -105,7 +105,7 @@ export class Assign {
   }
 
   selectedGroups.forEach(g => {
-    this.formService.assignFormToGroup(g.groupId, this.formId).subscribe({
+    this.formService.assignFormToGroup(g.groupId, this.formId, g.role.toUpperCase()).subscribe({
       next: () => {},
       error: () => {
         this.toastr.error(`Error assigning to group ${g.groupName}`);
