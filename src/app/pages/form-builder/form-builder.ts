@@ -122,7 +122,7 @@ export class FormBuilder {
         this.themeService.loadTheme();
         this.formTitle = form.title;
         this.formDescription = form.description;
-        this.formSettings = form.settings || { isQuizMode: false, defaultPointsPerField: 0 };
+        this.formSettings = form.settings;
         this.formSections = form.sections.map((section: any) => ({
           id: section.id ? section.id.toString() : crypto.randomUUID(),
           title: section.sectionTitle,

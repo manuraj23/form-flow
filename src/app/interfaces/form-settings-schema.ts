@@ -7,4 +7,5 @@ export interface FormSettingsSchema {
     isQuizMode?: boolean;
     showScore?: boolean;
     defaultPointsPerField?: number;
+    duration ?: number;
 }

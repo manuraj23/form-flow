@@ -57,6 +57,9 @@ export class FormSubmission {
   showReview = false;
   quizResult: any = null;
   showScore: boolean = false;
+  timeLeft: number = 0; // In seconds
+  timerInterval: any;
+  displayTime: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -91,7 +94,7 @@ export class FormSubmission {
             // this.themeService.setTheme(form.theme);
             // this.themeService.loadTheme();
             this.isReadOnly = false;
-            this.formService.getFormResponseById(formId).subscribe((res: any) => {
+            this.formService.getFormById(formId).subscribe((res: any) => {
               this.responseCount = res.length;
               if (this.checkAvailability(form)) {
                 this.handleTheme(form);
@@ -100,6 +103,9 @@ export class FormSubmission {
                 this.isFormReady = true;
                 this.loadDraft(formId);
                 this.setupDraftTimer(formId);
+                if (this.formStructure.settings?.isQuizMode && this.formStructure.settings?.duration > 0) {
+                  this.startTimer(this.formStructure.settings.duration);
+                }
               } else {
                 this.isClosed = true;
                 this.isFormReady = true;
@@ -269,6 +275,34 @@ export class FormSubmission {
     }
   }
 
+  startTimer(minutes: number) {
+    this.timeLeft = minutes * 60;
+    this.timerInterval = setInterval(() => {
+      if (this.timeLeft > 0) {
+        this.timeLeft--;
+        this.formatTime();
+      } else {
+        this.handleHardSubmit();
+      }
+    }, 1000);
+  }
+
+  formatTime() {
+    const mins = Math.floor(this.timeLeft / 60);
+    const secs = this.timeLeft % 60;
+    this.displayTime = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  }
+
+  handleHardSubmit() {
+    clearInterval(this.timerInterval);
+    this.toastr.warning('Time is up! Submitting your answers...');
+    this.submitResponse(); 
+  }
+
+  ngOnDestroy() {
+    if (this.timerInterval) clearInterval(this.timerInterval);
+  }
+
   submitResponse() {
     if (this.isReadOnly) {
       this.toastr.warning('This is a preview. Data is not saved to the database.');
@@ -292,7 +326,7 @@ export class FormSubmission {
           this.showScore =
             this.formStructure?.settings?.isQuizMode &&
             this.formStructure?.settings?.showScore;
-            console.log(this.showScore);
+          console.log(this.showScore);
 
           this.formGroup.reset();
           this.isSubmitting = false;

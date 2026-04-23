@@ -38,16 +38,19 @@
     </mat-slide-toggle>
 
     @if (data.isQuizMode) {
-    <div class="pl-8 flex flex-col gap-3 border-l-2 border-primary/20">
+    <div class="pl-8 flex flex-col gap-3 border-primary/20">
 
       <mat-slide-toggle [(ngModel)]="data.showScore">
         Show scores after submission
       </mat-slide-toggle>
 
       <div class="flex items-center gap-4">
-        <mat-form-field appearance="outline" class="w-32">
+        <mat-form-field appearance="outline" class="w-full">
           <mat-label>Default Points</mat-label>
           <input matInput type="number" [(ngModel)]="data.defaultPointsPerField">
+          <mat-label>Quiz Duration (Minutes)</mat-label>
+          <input matInput type="number" [(ngModel)]="data.duration" min="1">
+          <mat-icon matSuffix>timer</mat-icon>
         </mat-form-field>
       </div>
     </div>
