@@ -12,10 +12,11 @@ import { GenerateForm } from "../../components/generate-form/generate-form";
 import { Groups } from "../../components/groups/groups";
 import { MatDialog } from '@angular/material/dialog';
 import { LogoutDialog } from '../../components/dialogs/logout-dialog/logout-dialog';
+import { Templates } from '../../components/templates/templates';
 
 @Component({
   selector: 'app-home',
-  imports: [MatIconModule, CommonModule, MyForms, RouterLink, RouterOutlet, ThemeSelector, MatMenuModule, MatButtonModule, SharedWithMe, GenerateForm, Groups],
+  imports: [MatIconModule, CommonModule, MyForms, RouterLink, RouterOutlet, ThemeSelector, MatMenuModule, MatButtonModule, SharedWithMe, GenerateForm, Groups, Templates],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

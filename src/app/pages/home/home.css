@@ -125,3 +125,15 @@
     width: 85%;
     padding: 20px;
 }
+
+
+.sidebar ul li.active {
+    background-color: var(--mat-sys-primary);
+    color: var(--mat-sys-surface);  /* text white */
+    font-weight: 500;
+}
+
+/* icon bhi white ho jaye */
+.sidebar ul li.active mat-icon {
+    color: var(--mat-sys-surface);
+}

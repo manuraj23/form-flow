@@ -1,41 +1,62 @@
+@if (fieldData?.quizConfig?.isScored) {
+<div
+  class="absolute -top-3 right-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-600 text-white shadow-md z-10">
+  <span class="text-[10px] font-bold uppercase tracking-tighter">
+    {{ fieldData?.quizConfig?.points }} PTS
+    @if (fieldData.quizConfig?.negativeMarks && fieldData.quizConfig!.negativeMarks > 0) {
+    <span class="text-red-200 ml-1">(-{{ fieldData?.quizConfig?.negativeMarks }})</span>
+    }
+  </span>
+</div>
+}
 <mat-radio-group class="flex flex-col gap-3">
 
   @for (option of fieldData.options; let i = $index; track i) {
-    <div class="flex items-center gap-3 group">
+  <div class="flex items-center gap-3 group p-2 rounded-xl transition-all duration-300"
+    [class.bg-green-50]="fieldData.quizConfig?.correctAnswer === fieldData?.options?.[i]"
+    [class.border]="fieldData.quizConfig?.correctAnswer === fieldData?.options?.[i]"
+    [class.border-green-200]="fieldData.quizConfig?.correctAnswer === fieldData?.options?.[i]">
 
-      <mat-radio-button disabled></mat-radio-button>
-      <input
-        [(ngModel)]="fieldData.options![i]"
-        class="border-b border-transparent focus:border-theme outline-none text-sm w-full bg-transparent"
-        placeholder="Option label"
-      />
+    @if (fieldData?.quizConfig?.correctAnswer === fieldData?.options?.[i]) {
+    <mat-icon class="text-green-600 scale-90">check_circle</mat-icon>
+    } @else {
+    <mat-radio-button disabled></mat-radio-button>
+    }
 
-      @if (fieldData.options!.length > 1) {
-        <button
-          (click)="removeOption(i)"
-          class="p-1 rounded-full text-red-400 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition">
-          
-          <mat-icon class="text-base">delete</mat-icon>
+    <input [(ngModel)]="fieldData.options![i]"
+      class="border-b border-transparent focus:border-theme outline-none text-sm w-full bg-transparent"
+      [class.font-bold]="fieldData.quizConfig?.correctAnswer === fieldData?.options?.[i]"
+      [class.text-green-700]="fieldData.quizConfig?.correctAnswer === fieldData?.options?.[i]"
+      placeholder="Option label" />
 
-        </button>
-      }
-
-    </div>
+    @if (fieldData.options!.length > 1) {
+    <button (click)="removeOption(i)"
+      class="p-1 rounded-full text-red-400 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition">
+      <mat-icon class="text-base">delete</mat-icon>
+    </button>
+    }
+  </div>
   }
 
 </mat-radio-group>
 
-<button
-  (click)="addOption()"
-  class="text-primary text-sm font-medium mt-2 text-left hover:underline block pb-5">
+<button (click)="addOption()" class="text-primary text-sm font-medium mt-2 text-left hover:underline block pb-5">
   + Add Option
 </button>
 
+@if (fieldData.quizConfig?.isScored && !fieldData.quizConfig?.correctAnswer) {
+<p class="text-[10px] text-primary font-bold mt-2 flex items-center gap-1">
+  <mat-icon class="!w-3 !h-3 !text-[12px]">warning</mat-icon>
+  No correct answer selected
+</p>
+}
+
 @if (fieldData.validations?.required) {
-  <div class="flex justify-start items-end">
-    <mat-icon [style.color]="'var(--mat-sys-on-surface-variant)'" style="font-size: 16px;" class="relative top-1">check_circle_outline</mat-icon>
-    <span class="text-primary capitalize italic font-medium opacity-60">Required</span>
-  </div>
+<div class="flex justify-start items-end">
+  <mat-icon [style.color]="'var(--mat-sys-on-surface-variant)'" style="font-size: 16px;"
+    class="relative top-1">check_circle_outline</mat-icon>
+  <span class="text-primary capitalize italic font-medium opacity-60">Required</span>
+</div>
 }
 
 <!-- <mat-radio-group>
@@ -48,3 +69,11 @@
 @if (fieldData.validations?.required) {
   <mat-error>Required Field</mat-error>
 } -->
+
+@if (fieldData.fieldLogic?.enabled) {
+<div
+  class="absolute -top-3 left-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary text-white shadow-md z-10">
+  <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">account_tree</mat-icon>
+  <span class="text-[10px] font-bold uppercase tracking-tighter">Logic Enabled</span>
+</div>
+}

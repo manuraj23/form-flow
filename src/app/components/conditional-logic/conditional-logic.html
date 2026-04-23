@@ -1,0 +1,77 @@
+@if (availableSources.length > 0) {
+<div class="space-y-6 p-4">
+    <div class="flex items-center justify-between">
+        <span class="font-medium text-gray-700">Enable Conditional Logic</span>
+        <mat-slide-toggle [(ngModel)]="logicData.enabled" (change)="emitChange()">
+        </mat-slide-toggle>
+    </div>
+
+    @if (logicData?.enabled) {
+    <div class="grid grid-cols-1 gap-4 mt-4 animate-in fade-in duration-300">
+        <div class="text-center text-xs text-muted uppercase font-bold tracking-widest my-1">
+            When
+        </div>
+
+        <div class="p-4 bg-container flex flex-col shadow-sm space-y-4">
+
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Select Question</mat-label>
+                <mat-select [(ngModel)]="logicData.sourceFieldId" (selectionChange)="onSourceChange($event.value)"
+                    required>
+                    @for (field of availableSources; track field.id) {
+                    <mat-option [value]="field.id">
+                        {{ field.label || field.fieldConfig?.label || 'Untitled Field' }}
+                    </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="w-1/2">
+                <mat-label>Condition</mat-label>
+                <mat-select [(ngModel)]="logicData.operator" (selectionChange)="emitChange()" required>
+                    <mat-option value="EQUALS">Is equal to</mat-option>
+                    <mat-option value="NOT_EQUALS">Is not equal to</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-1/2">
+                <mat-label>Value</mat-label>
+                <mat-select [(ngModel)]="logicData.value" (selectionChange)="emitChange()"
+                    [disabled]="!logicData.sourceFieldId" required>
+                    @for (opt of availableOptions; track $index) {
+                    <mat-option [value]="opt">{{ opt }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+
+        </div>
+
+        <div class="text-center text-xs text-muted uppercase font-bold tracking-widest my-1">
+            Then
+        </div>
+
+        <div class="flex items-center gap-2 p-3 bg-primary/5 rounded-lg">
+            <span class="font-medium">Action:</span>
+            <mat-form-field appearance="fill" class="flex-grow dense-form-field">
+                <mat-select [(ngModel)]="logicData.action" (selectionChange)="emitChange()">
+                    <mat-option value="SHOW">Show this element</mat-option>
+                    <mat-option value="HIDE">Hide this element</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+    </div>
+    } @else {
+    <p class="text-sm text-gray-500 italic">This item will always be visible to users.</p>
+    }
+</div>
+} @else {
+<div
+    class="flex flex-col items-center justify-center p-8 text-center bg-container rounded-lg border-2 border-dashed border-theme">
+    <mat-icon class="text-gray-400 !w-12 !h-12 !text-[48px] mb-4">info_outline</mat-icon>
+    <h3 class="text-gray-600 font-medium">No Source Fields Available</h3>
+    <p class="text-gray-400 text-sm max-w-[250px]">
+        Conditional logic requires at least one <strong>Radio, Checkbox, or Dropdown</strong> field to be placed
+        <em>above</em> this field.
+    </p>
+</div>
+}

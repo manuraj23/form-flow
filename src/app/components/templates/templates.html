@@ -1,0 +1,43 @@
+<div class="templates-container">
+
+  <div class="featured-card">
+    <div class="featured-content">
+      <span class="badge">POPULAR CHOICE</span>
+      <h1>{{ selectedTemplate?.title }}</h1>
+      <p>
+        {{ selectedTemplate?.description }}
+      </p>
+
+      <div class="actions">
+        <button class="primary-btn" (click)="useTemplate()">Use Template</button>
+        <button class="secondary-btn" (click)="previewTemplate()">Preview</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔹 Filters -->
+  <div class="filters">
+    <button class="active">All Templates</button>
+    <!-- <button>Marketing</button>
+    <button>Human Resources</button>
+    <button>Education</button>
+    <button>Events</button>
+    <button>Feedback</button> -->
+  </div>
+
+  <!-- 🔹 Grid -->
+  <div class="template-grid">
+    <div class="template-card" *ngFor="let item of templates" (click)="selectTemplate(item)">
+      <div class="card-image">
+        <img [src]="" />
+      </div>
+
+      <div class="card-content">
+        <span class="category">{{item.templateName}}</span>
+        <h3>{{item.title}}</h3>
+        <p>{{item.description}}</p>
+      </div>
+    </div>
+  </div>
+
+</div>

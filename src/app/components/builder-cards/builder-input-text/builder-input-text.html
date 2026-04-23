@@ -2,30 +2,39 @@
   <input matInput [type]="type" [placeholder]="fieldData.placeholder ?? 'input here...'" />
 </mat-form-field>
 @if (fieldData.validations?.required) {
-  <div class="flex justify-start items-end">
-    <mat-icon [style.color]="'var(--mat-sys-on-surface-variant)'" style="font-size: 16px;" class="relative top-1">check_circle_outline</mat-icon>
-    <span class="text-primary capitalize italic font-medium opacity-60">Required</span>
-  </div>
+<div class="flex justify-start items-end">
+  <mat-icon [style.color]="'var(--mat-sys-on-surface-variant)'" style="font-size: 16px;"
+    class="relative top-1">check_circle_outline</mat-icon>
+  <span class="text-primary capitalize italic font-medium opacity-60">Required</span>
+</div>
 }
 @if (fieldData.validations?.minLength ?? 0) {
-  <div class="flex justify-start items-end">
-    <mat-icon [style.color]="'var(--mat-sys-on-surface-variant)'" style="font-size: 16px;" class="relative top-1">notes</mat-icon>
-    <span class="text-primary capitalize italic font-medium opacity-60"
-      >Minimum Length: <span class="text-muted">{{ fieldData.validations?.minLength }}</span></span
-    >
-  </div>
+<div class="flex justify-start items-end">
+  <mat-icon [style.color]="'var(--mat-sys-on-surface-variant)'" style="font-size: 16px;"
+    class="relative top-1">notes</mat-icon>
+  <span class="text-primary capitalize italic font-medium opacity-60">Minimum Length: <span class="text-muted">{{
+      fieldData.validations?.minLength }}</span></span>
+</div>
 }
 @if (fieldData.validations?.maxLength) {
-  <div class="flex justify-start items-end">
-    <mat-icon [style.color]="'var(--mat-sys-on-surface-variant)'" style="font-size: 16px;" class="relative top-1">notes</mat-icon>
-    <span class="text-primary capitalize italic font-medium opacity-60"
-      >Maximum Length: <span class="text-muted">{{ fieldData.validations?.maxLength }}</span></span
-    >
-  </div>
+<div class="flex justify-start items-end">
+  <mat-icon [style.color]="'var(--mat-sys-on-surface-variant)'" style="font-size: 16px;"
+    class="relative top-1">notes</mat-icon>
+  <span class="text-primary capitalize italic font-medium opacity-60">Maximum Length: <span class="text-muted">{{
+      fieldData.validations?.maxLength }}</span></span>
+</div>
 }
 @if (fieldData.validations?.email) {
-  <div class="flex justify-start items-end">
-    <mat-icon [style.color]="'var(--mat-sys-on-surface-variant)'" style="font-size: 16px;" class="relative top-1">mail_outline</mat-icon>
-    <span class="text-primary capitalize italic font-medium opacity-60">Email Field</span>
-  </div>
+<div class="flex justify-start items-end">
+  <mat-icon [style.color]="'var(--mat-sys-on-surface-variant)'" style="font-size: 16px;"
+    class="relative top-1">mail_outline</mat-icon>
+  <span class="text-primary capitalize italic font-medium opacity-60">Email Field</span>
+</div>
+}
+
+@if (fieldData.fieldLogic?.enabled) {
+    <div class="absolute -top-3 left-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary text-white shadow-md z-10">
+      <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">account_tree</mat-icon>
+      <span class="text-[10px] font-bold uppercase tracking-tighter">Logic Enabled</span>
+    </div>
 }

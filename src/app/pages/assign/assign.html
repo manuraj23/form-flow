@@ -35,16 +35,33 @@
         <!-- SEARCH -->
         <div class="search">
           <mat-icon>search</mat-icon>
-          <input type="text" placeholder="Search teams or people..." [(ngModel)]="searchText" (keyup.enter)="searchUser()" />
+          <input type="text" placeholder="Search teams or people..." [(ngModel)]="searchText" (keyup.enter)="search()" />
         </div>
 
 
         <!-- SEARCH RESULT DROPDOWN -->
-<div *ngIf="searchedUser" class="search-result">
-  <span>{{ searchedUser }}</span>
-  <span>{{searchText}}</span>
-  <button (click)="addRecipient()">Add</button>
-</div>
+        <div *ngIf="searchedUser" class="search-result">
+          <span>{{ searchedUser }}</span>
+          <span>{{ searchText }}</span>
+          <button (click)="addRecipient()">Add</button>
+        </div>
+
+        <!-- Group result -->
+        <div *ngFor="let g of searchedGroups" class="search-result">
+          <div class="left-info">
+            <span class="title">{{ g.groupName }}</span>
+          </div>
+
+          <div class="right-group">
+            <mat-checkbox [(ngModel)]="g.selected" (change)="updateSummary()"></mat-checkbox>
+
+            <!-- <select class="role-dropdown" [(ngModel)]="g.role" (change)="updateSummary()">
+              <option value="Viewer">Viewer</option>
+              <option value="Respondent">Respondent</option>
+              <option value="Editor">Editor</option>
+            </select> -->
+          </div>
+        </div>
 
 
 

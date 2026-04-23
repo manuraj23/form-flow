@@ -1,5 +1,7 @@
+import { CondLogicSchema } from "./cond-logic-schema";
 import { FieldStyleSchema } from "./field-style-schema";
 import { FormSettingsSchema } from "./form-settings-schema";
+import { Quizconfigschema } from "./quizconfigschema";
 
 export interface Field {
   id?:string;
@@ -7,6 +9,8 @@ export interface Field {
   fieldOrder: number;
   fieldConfig: {};
   fieldStyle: FieldStyleSchema;
+  fieldLogic?: CondLogicSchema;
+  quizConfig?: Quizconfigschema;
 }
 
 export interface Section {

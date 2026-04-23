@@ -25,6 +25,9 @@ import { ThemeService } from '../../services/theme-service';
 import { BuilderCheckBox } from '../../components/builder-cards/builder-check-box/builder-check-box';
 import { ToastrService } from 'ngx-toastr';
 import { FormSettingsDialog } from '../../components/form-settings-dialog/form-settings-dialog';
+import { ConditionalLogicService } from '../../services/conditional-logic-service';
+import { ConditionalLogic } from '../../components/conditional-logic/conditional-logic';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-form-builder',
@@ -46,6 +49,7 @@ import { FormSettingsDialog } from '../../components/form-settings-dialog/form-s
     DragDropModule,
     MatMenuModule,
     ThemeSelector,
+    MatTooltipModule,
   ],
   templateUrl: './form-builder.html',
   styleUrl: './form-builder.css',
@@ -55,7 +59,7 @@ export class FormBuilder {
   formDescription: string = '';
   formSections: any[] = [
     {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       title: 'Add Section Title',
       fields: [],
     },
@@ -69,6 +73,7 @@ export class FormBuilder {
   predefinedColours: string[] = ['#000000', '#EF4444', '#10B981', '#3B82F6'];
   mode: string = '';
   parentid: string | null = null;
+
   constructor(
     private dialog: MatDialog,
     private router: Router,
@@ -77,7 +82,8 @@ export class FormBuilder {
     private themeService: ThemeService,
     private cd: ChangeDetectorRef,
     private toastr: ToastrService,
-  ) {}
+    private conditionalLogicService: ConditionalLogicService,
+  ) { }
 
   elements = [
     { type: 'TEXT', label: 'Text Input' },
@@ -90,18 +96,16 @@ export class FormBuilder {
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
-    this.mode = params['mode'];
-    this.parentid = params['parentId'] || null;
+      this.mode = params['mode'];
+      this.parentid = params['parentId'] || null;
     });
-    console.log("create button parent id:",this.parentid);
-  
+    console.log("create button parent id:", this.parentid);
+
     this.editingFormId = this.route.snapshot.paramMap.get('id');
     console.log('Editing Form ID:', this.editingFormId);
     if (this.editingFormId) {
       this.loadFromForEditing(this.editingFormId);
     }
-
-  
 
     if (localStorage.getItem('prevTheme') === null) {
       localStorage.setItem('prevTheme', localStorage.getItem('theme') || 'theme-pink');
@@ -118,9 +122,9 @@ export class FormBuilder {
         this.themeService.loadTheme();
         this.formTitle = form.title;
         this.formDescription = form.description;
-        this.formSettings = form.settings;
+        this.formSettings = form.settings || { isQuizMode: false, defaultPointsPerField: 0 };
         this.formSections = form.sections.map((section: any) => ({
-          id: section.id ? section.id.toString() : Date.now().toString(),
+          id: section.id ? section.id.toString() : crypto.randomUUID(),
           title: section.sectionTitle,
           fields: section.fields
             .sort((a: any, b: any) => a.fieldOrder - b.fieldOrder)
@@ -129,13 +133,19 @@ export class FormBuilder {
               type: field.fieldType,
               label: field.fieldConfig.label,
               validations: field.fieldConfig.validations || {},
-              options: field.fieldConfig.options || [],
+              options: field.fieldConfig.options,
               placeholder: field.fieldConfig.placeholder || '',
-              color: field.fieldStyle.color ||'#000000',
-              fontSize: field.fieldStyle.fontSize ||'12px',
+              fieldLogic: field.fieldLogic || {
+                enabled: false
+              },
+              color: field.fieldStyle.color || '#000000',
+              fontSize: field.fieldStyle.fontSize || '12px',
               bold: field.fieldStyle.bold || false,
               italic: field.fieldStyle.italics || false,
               underline: field.fieldStyle.underline || false,
+              quizConfig: field.quizConfig || {
+                isScored: false,
+              }
             })),
         }));
         this.formSections = [...this.formSections];
@@ -150,15 +160,49 @@ export class FormBuilder {
 
   openSettings() {
     const dialogRef = this.dialog.open(FormSettingsDialog, {
-      width: '800px',
+      width: '400px',
       data: { ...this.formSettings }
     });
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.formSettings = result;
+
+        if (result.isQuizMode && result.defaultPointsPerField > 0) {
+          this.applyBulkScores(result.defaultPointsPerField);
+        }
+
+        // Force immediate UI refresh
+        setTimeout(() => {
+          this.cd.detectChanges();
+        }, 0);
       }
     });
+  }
+
+  applyBulkScores(points: number) {
+    this.formSections.forEach(section => {
+      section.fields.forEach((field: { type: string; quizConfig: { isScored: boolean; points: number; }; }) => {
+        if (['RADIO', 'CHECKBOX', 'DROPDOWN'].includes(field.type)) {
+          field.quizConfig.isScored = true;
+          field.quizConfig.points = points;
+        }
+      });
+    });
+    this.toastr.success(`Quiz Mode: All selection fields set to ${points} points.`);
+    this.cd.detectChanges();
+  }
+
+  get totalQuizScore(): number {
+    let total = 0;
+    this.formSections.forEach(section => {
+      section.fields.forEach((field: { quizConfig: { isScored: any; points: any; }; }) => {
+        if (field.quizConfig.isScored) {
+          total += (field.quizConfig.points || 0);
+        }
+      });
+    });
+    return total;
   }
 
   saveForm(isPublished: boolean) {
@@ -181,7 +225,7 @@ export class FormBuilder {
       title: this.formTitle,
       description: this.formDescription,
       sections: this.formSections,
-      pubilshed: isPublished,
+      published: isPublished,
       settings: this.formSettings,
     };
     console.log(formToSave);
@@ -189,24 +233,25 @@ export class FormBuilder {
     if (this.editingFormId) {
       this.formService.updateForm(formToSave).subscribe({
         next: (response) => {
-          
-          if(this.mode === 'version') {
+
+          if (this.mode === 'version') {
             this.toastr.success('Version Updated Successfully to Database!');
             this.router.navigate(['/versions', this.editingFormId]);
           }
-          else {   
+          else {
             if (!isPublished) {
-            this.toastr.success('Form Updated Successfully to Database!');
-          } else {
-            this.toastr.success('Form is Published!');
-          }          
+              this.toastr.success('Form Updated Successfully to Database!');
+            } else {
+              this.toastr.success('Form is Published!');
+            }
             this.router.navigate(['/']);
           }
-          
+
         },
         error: (err) => {
           console.error(err);
-          this.toastr.error('Error saving form to backend. Check if Spring Boot is running.');
+            this.toastr.error('Can not update form having responses(Create new version).');
+          // this.toastr.error('Error saving form to backend. Check if Spring Boot is running.');
         },
       });
     } else {
@@ -233,7 +278,7 @@ export class FormBuilder {
 
   addSection() {
     this.formSections.push({
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       title: `Add Section Title`,
       fields: [],
     });
@@ -252,10 +297,10 @@ export class FormBuilder {
 
     const clonedSection = JSON.parse(JSON.stringify(originalSection));
 
-    clonedSection.id = Date.now().toString();
+    clonedSection.id = crypto.randomUUID();
     clonedSection.title = 'Copy of ' + clonedSection.title;
     clonedSection.fields.forEach((field: any, index: number) => {
-      field.id = Date.now().toString() + index;
+      field.id = crypto.randomUUID();
     });
 
     this.formSections.splice(sectionIndex + 1, 0, clonedSection);
@@ -274,18 +319,26 @@ export class FormBuilder {
       const field = event.previousContainer.data[event.previousIndex];
 
       const newField = {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         type: field.type,
         label: field.label,
         validations: {},
         options: ['CHECKBOX', 'RADIO', 'DROPDOWN'].includes(field.type) ? ['Option 1'] : [],
         placeholder: field.placeholder || '',
-
+        fieldLogic: {
+          enabled: false
+        },
         color: '#000000',
         fontSize: '12px',
         bold: false,
         italic: false,
         underline: false,
+        quizConfig: ['CHECKBOX', 'RADIO', 'DROPDOWN'].includes(field.type) && this.formSettings?.isQuizMode ? {
+          isScored: true,
+          points: this.formSettings.defaultPointsPerField || 0,
+          negativeMarks: 0,
+          correctAnswer: '',
+        } : { isScored: false },
       };
 
       this.formSections[sectionIndex].fields.splice(event.currentIndex, 0, newField);
@@ -310,14 +363,26 @@ export class FormBuilder {
   }
 
   editField(sectionIndex: number, fieldIndex: number) {
-    // open edit dialog box and edit the copy of it until saved
+    const field = this.formSections[sectionIndex].fields[fieldIndex];
+
+    if (!field.fieldLogic) {
+      field.fieldLogic = {
+        enabled: false
+      };
+    }
+
     const fieldToEdit = JSON.parse(
-      JSON.stringify(this.formSections[sectionIndex].fields[fieldIndex]),
+      JSON.stringify(field),
     );
+
+    this.conditionalLogicService.updateFormState({ sections: this.formSections });
 
     const dialogRef = this.dialog.open(EditField, {
       width: '400px',
-      data: fieldToEdit,
+      data: {
+        field: fieldToEdit,
+        isQuizMode: this.formSettings?.isQuizMode || false,
+      },
       panelClass: 'custom-dialog-container',
     });
 
@@ -330,6 +395,7 @@ export class FormBuilder {
         this.cd.detectChanges();
       }
     });
+    this.cd.detectChanges();
   }
 
   duplicateField(sectionIndex: number, fieldIndex: number) {
@@ -337,7 +403,7 @@ export class FormBuilder {
 
     const clonedField = JSON.parse(JSON.stringify(originalField));
 
-    clonedField.id = Date.now().toString();
+    clonedField.id = crypto.randomUUID();
 
     this.formSections[sectionIndex].fields.splice(fieldIndex + 1, 0, clonedField);
   }
@@ -364,7 +430,7 @@ export class FormBuilder {
           fieldType: field.type,
           fieldOrder: fIndex + 1,
           id: field.id || `temp_${fIndex}`,
-          fieldConfig: {
+           fieldConfig: {
             label: field.label,
             placeholder: field.placeholder,
             options: field.options,
@@ -376,7 +442,9 @@ export class FormBuilder {
             bold: field.bold,
             italics: field.italics,
             underline: field.underline
-          }
+          },
+          fieldLogic: field.fieldLogic,
+          quizConfig: field.quizConfig,
         })),
       })),
       isReadOnly: true,
@@ -387,8 +455,6 @@ export class FormBuilder {
       data: previewData,
     });
   }
-
-
 
   saveVersion(isPublished: boolean) {
     const hasFields = this.formSections.some(
@@ -409,31 +475,149 @@ export class FormBuilder {
       title: this.formTitle,
       description: this.formDescription,
       sections: this.formSections,
-      pubilshed: true,
+      published: true,
       settings: this.formSettings,
       mainParentId: this.parentid,
     };
     console.log(formToSave);
     console.log('Parent id:', formToSave.mainParentId);
-      
-    this.formService.createForm(formToSave).subscribe({
-        next: (response) => {
-          if (!isPublished) {
-            this.toastr.success('Form Saved Successfully to Database!');
-          } else {
-            this.toastr.success('Form is Published!');
-          }
 
-          this.router.navigate(['/']);
-        },
-        error: (err) => {
-          console.error(err);
-          this.toastr.error('Error saving form.');
-        },
-      });
-    
+    this.formService.createForm(formToSave).subscribe({
+      next: (response) => {
+        if (!isPublished) {
+          this.toastr.success('Form Saved Successfully to Database!');
+        } else {
+          this.toastr.success('Form is Published!');
+        }
+
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error('Error saving form.');
+      },
+    });
+
     localStorage.setItem('theme', localStorage.getItem('prevTheme') || 'theme-pink');
     localStorage.removeItem('prevTheme');
     this.themeService.loadTheme();
   }
+
+
+  // onDrop(event: CdkDragDrop<any[]>, sectionIndex: number) {
+
+  //   // Reorder inside same section
+  //   if (event.previousContainer === event.container) {
+  //     moveItemInArray(
+  //       event.container.data,
+  //       event.previousIndex,
+  //       event.currentIndex
+  //     );
+  //     return;
+  //   }
+
+  //   // Sidebar → Canvas
+  //   if (event.previousContainer.id === 'sidebar') {
+
+  //     // IMPORTANT: Deep clone dragged item
+  //     const draggedItem = JSON.parse(
+  //       JSON.stringify(event.item.data)
+  //     );
+
+  //     const isQuiz = this.formSettings?.isQuiz;
+
+  //     const newField: any = {
+  //       id: Date.now().toString(),
+  //       type: draggedItem.type,
+  //       fieldConfig: {
+  //         label: draggedItem.label,
+  //         validations: {},
+  //         placeholder: '',
+  //         options: [],
+  //       },
+  //       fieldStyle: {
+  //       color: '#000000',
+  //       fontSize: '12px',
+  //       bold: false,
+  //       italic: false,
+  //       underline: false,
+  //       }
+  //     };
+
+  //     // Assign options ONLY for correct types
+  //     if (['CHECKBOX', 'RADIO', 'DROPDOWN'].includes(newField.type)) {
+  //       newField.options = [
+  //         { label: 'Option 1', isCorrect: false },
+  //         { label: 'Option 2', isCorrect: false }
+  //       ];
+  //       if (isQuiz) {
+  //         if (newField.type === 'TEXT') {
+  //           newField.correctAnswer = '';
+  //         }
+  //       }
+  //       // Insert into section
+  //       this.formSections[sectionIndex].fields.splice(
+  //         event.currentIndex,
+  //         0,
+  //         newField
+  //       );
+
+  //       //Force UI refresh (important)
+  //       this.formSections = [...this.formSections];
+  //       return;
+  //     }
+
+  //     // Between sections
+  //     transferArrayItem(
+  //       event.previousContainer.data,
+  //       event.container.data,
+  //       event.previousIndex,
+  //       event.currentIndex
+  //     );
+
+  //     // Refresh
+  //     this.formSections = [...this.formSections];
+  //   }
+  // }
+
+  // openSectionSettings(sectionIndex: number) {
+  //   if (!this.formSettings?.isQuiz) {
+  //     this.toastr.warning('Enable Quiz mode to use marks settings');
+  //     return;
+  //   }
+
+  //   const dialogRef = this.dialog.open(FormSettingsMarks, {
+  //     width: '350px',
+  //     maxWidth: '90vw',
+  //     data: {
+  //       positiveMarks: this.formSections[sectionIndex]?.positiveMarks || 0,
+  //       negativeMarks: this.formSections[sectionIndex]?.negativeMarks || 0
+  //     }
+  //   });
+
+  //   dialogRef.afterClosed().subscribe(result => {
+  //     if (result) {
+  //       this.formSections[sectionIndex] = {
+  //         ...this.formSections[sectionIndex],
+  //         positiveMarks: result.positiveMarks,
+  //         negativeMarks: result.negativeMarks
+  //       };
+  //     }
+  //   });
+  // }
+
+  // get filteredElements() {
+  //   if (this.formSettings?.isQuiz) {
+  //     return this.elements.filter(el =>
+  //       ['TEXT', 'CHECKBOX', 'DROPDOWN', 'RADIO'].includes(el.type)
+  //     );
+  //   }
+  //   return this.elements;
+  // }
+
+  // setCorrectOption(field: any, index: number) {
+  //   field.options.forEach((opt: any, i: number) => {
+  //     opt.isCorrect = i === index;
+  //   });
+  // }
 }
