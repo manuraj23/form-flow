@@ -1,0 +1,183 @@
+.templates-container {
+  margin: 20px;
+}
+
+/* 🔹 Filters */
+.filters {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.filters button {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: none;
+  background-color: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface-variant);
+  cursor: pointer;
+  font-size: 13px;
+  transition: 0.2s;
+}
+
+.filters button:hover {
+  background-color: var(--mat-sys-primary-container);
+  color: var(--mat-sys-primary);
+}
+
+.filters button.active {
+  background-color: var(--mat-sys-primary);
+  color: white;
+}
+
+/* 🔹 Grid */
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+/* 🔹 Card */
+.template-card {
+  background-color: var(--mat-sys-surface-container);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.template-card:hover {
+  transform: translateY(-5px);
+}
+
+/* 🔹 Image */
+.card-image img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+/* 🔹 Content */
+.card-content {
+  padding: 15px;
+}
+
+.category {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--mat-sys-primary);
+  font-weight: 600;
+}
+
+.card-content h3 {
+  margin: 5px 0;
+  font-size: 16px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.card-content p {
+  font-size: 13px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+/* 🔥 Featured Card */
+.featured-card {
+  position: relative;
+  height: 260px;
+  border-radius: 20px;
+  overflow: hidden;
+  padding: 30px;
+
+  display: flex;
+  align-items: center;
+
+  /* Background image + gradient overlay */
+  background: 
+    linear-gradient(to right, rgba(0,0,0,0.65), rgba(0,0,0,0.2)),
+    url('/assets/featured.jpg') center/cover no-repeat;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* Content */
+.featured-content {
+  max-width: 520px;
+  color: white;
+  z-index: 2;
+}
+
+/* Badge */
+.badge {
+  display: inline-block;
+   background: linear-gradient(
+    135deg,
+    var(--mat-sys-primary),
+    var(--mat-sys-primary-container)
+  );
+  color: var(--mat-sys-on-primary);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Heading */
+.featured-content h1 {
+  margin: 12px 0;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Description */
+.featured-content p {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 18px;
+}
+
+/* Buttons */
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Primary Button */
+.primary-btn {
+  background: linear-gradient(
+    135deg,
+    var(--mat-sys-primary),
+    var(--mat-sys-primary-container)
+  );
+  color: var(--mat-sys-on-primary);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.primary-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+
+/* Secondary Button */
+.secondary-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--mat-sys-outline);
+  color: var(--mat-sys-on-surface);
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: 0.2s ease;
+}
+
+.secondary-btn:hover {
+  background: var(--mat-sys-surface-container);
+}
