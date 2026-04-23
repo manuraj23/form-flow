@@ -108,7 +108,7 @@ export class FormService {
   }
 
   generateForm(promptText : string): Observable<any> {
-    return this.http.post(this.url + 'ai/generateForm', {
+    return this.http.post(this.url + 'user/form/generate', {
       prompt : promptText
     });
   }
