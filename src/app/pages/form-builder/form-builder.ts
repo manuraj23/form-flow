@@ -250,7 +250,8 @@ export class FormBuilder {
         },
         error: (err) => {
           console.error(err);
-          this.toastr.error('Error saving form to backend. Check if Spring Boot is running.');
+            this.toastr.error('Can not update form having responses(Create new version).');
+          // this.toastr.error('Error saving form to backend. Check if Spring Boot is running.');
         },
       });
     } else {
