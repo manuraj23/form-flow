@@ -86,6 +86,7 @@ export class FormSubmission {
       if (formId) {
         this.formService.getResponseFormById(formId).subscribe({
           next: (form: Form) => {
+            console.log(form);
             this.formStructure = form;
             console.log(this.formStructure);
             // if (localStorage.getItem('prevTheme') === null) {
@@ -94,8 +95,8 @@ export class FormSubmission {
             // this.themeService.setTheme(form.theme);
             // this.themeService.loadTheme();
             this.isReadOnly = false;
-            this.formService.getFormById(formId).subscribe((res: any) => {
-              this.responseCount = res.length;
+            // this.formService.getResponseFormById(formId).subscribe((res: any) => {
+            this.responseCount = form.totalResponses;
               if (this.checkAvailability(form)) {
                 this.handleTheme(form);
                 this.buildReactiveForm();
@@ -111,7 +112,7 @@ export class FormSubmission {
                 this.isFormReady = true;
               }
               this.cd.detectChanges();
-            });
+            // });
           },
           error: (err) => {
             //console.error('Could not fetch form:', err);

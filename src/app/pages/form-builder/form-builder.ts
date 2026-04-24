@@ -26,8 +26,8 @@ import { BuilderCheckBox } from '../../components/builder-cards/builder-check-bo
 import { ToastrService } from 'ngx-toastr';
 import { FormSettingsDialog } from '../../components/form-settings-dialog/form-settings-dialog';
 import { ConditionalLogicService } from '../../services/conditional-logic-service';
-import { ConditionalLogic } from '../../components/conditional-logic/conditional-logic';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-form-builder',
@@ -74,6 +74,9 @@ export class FormBuilder {
   mode: string = '';
   parentid: string | null = null;
 
+  isMobile = false;
+  isDrawerOpen = false;
+
   constructor(
     private dialog: MatDialog,
     private router: Router,
@@ -83,6 +86,7 @@ export class FormBuilder {
     private cd: ChangeDetectorRef,
     private toastr: ToastrService,
     private conditionalLogicService: ConditionalLogicService,
+    private breakpointObserver: BreakpointObserver,
   ) { }
 
   elements = [
@@ -95,6 +99,11 @@ export class FormBuilder {
   ];
 
   ngOnInit() {
+    this.breakpointObserver.observe(['(max-width: 768px)']).subscribe(result => {
+      this.isMobile = result.matches;
+      if (!this.isMobile) this.isDrawerOpen = true;
+    });
+
     this.route.queryParams.subscribe(params => {
       this.mode = params['mode'];
       this.parentid = params['parentId'] || null;
@@ -250,7 +259,7 @@ export class FormBuilder {
         },
         error: (err) => {
           console.error(err);
-            this.toastr.error('Can not update form having responses(Create new version).');
+          this.toastr.error('Can not update form having responses(Create new version).');
           // this.toastr.error('Error saving form to backend. Check if Spring Boot is running.');
         },
       });
@@ -308,6 +317,10 @@ export class FormBuilder {
 
   get sectionsIds(): string[] {
     return this.formSections.map((s) => s.id);
+  }
+
+  toggleDrawer() {
+    this.isDrawerOpen = !this.isDrawerOpen;
   }
 
   onDrop(event: CdkDragDrop<any[]>, sectionIndex: number) {
@@ -430,7 +443,7 @@ export class FormBuilder {
           fieldType: field.type,
           fieldOrder: fIndex + 1,
           id: field.id || `temp_${fIndex}`,
-           fieldConfig: {
+          fieldConfig: {
             label: field.label,
             placeholder: field.placeholder,
             options: field.options,
@@ -502,122 +515,4 @@ export class FormBuilder {
     localStorage.removeItem('prevTheme');
     this.themeService.loadTheme();
   }
-
-
-  // onDrop(event: CdkDragDrop<any[]>, sectionIndex: number) {
-
-  //   // Reorder inside same section
-  //   if (event.previousContainer === event.container) {
-  //     moveItemInArray(
-  //       event.container.data,
-  //       event.previousIndex,
-  //       event.currentIndex
-  //     );
-  //     return;
-  //   }
-
-  //   // Sidebar → Canvas
-  //   if (event.previousContainer.id === 'sidebar') {
-
-  //     // IMPORTANT: Deep clone dragged item
-  //     const draggedItem = JSON.parse(
-  //       JSON.stringify(event.item.data)
-  //     );
-
-  //     const isQuiz = this.formSettings?.isQuiz;
-
-  //     const newField: any = {
-  //       id: Date.now().toString(),
-  //       type: draggedItem.type,
-  //       fieldConfig: {
-  //         label: draggedItem.label,
-  //         validations: {},
-  //         placeholder: '',
-  //         options: [],
-  //       },
-  //       fieldStyle: {
-  //       color: '#000000',
-  //       fontSize: '12px',
-  //       bold: false,
-  //       italic: false,
-  //       underline: false,
-  //       }
-  //     };
-
-  //     // Assign options ONLY for correct types
-  //     if (['CHECKBOX', 'RADIO', 'DROPDOWN'].includes(newField.type)) {
-  //       newField.options = [
-  //         { label: 'Option 1', isCorrect: false },
-  //         { label: 'Option 2', isCorrect: false }
-  //       ];
-  //       if (isQuiz) {
-  //         if (newField.type === 'TEXT') {
-  //           newField.correctAnswer = '';
-  //         }
-  //       }
-  //       // Insert into section
-  //       this.formSections[sectionIndex].fields.splice(
-  //         event.currentIndex,
-  //         0,
-  //         newField
-  //       );
-
-  //       //Force UI refresh (important)
-  //       this.formSections = [...this.formSections];
-  //       return;
-  //     }
-
-  //     // Between sections
-  //     transferArrayItem(
-  //       event.previousContainer.data,
-  //       event.container.data,
-  //       event.previousIndex,
-  //       event.currentIndex
-  //     );
-
-  //     // Refresh
-  //     this.formSections = [...this.formSections];
-  //   }
-  // }
-
-  // openSectionSettings(sectionIndex: number) {
-  //   if (!this.formSettings?.isQuiz) {
-  //     this.toastr.warning('Enable Quiz mode to use marks settings');
-  //     return;
-  //   }
-
-  //   const dialogRef = this.dialog.open(FormSettingsMarks, {
-  //     width: '350px',
-  //     maxWidth: '90vw',
-  //     data: {
-  //       positiveMarks: this.formSections[sectionIndex]?.positiveMarks || 0,
-  //       negativeMarks: this.formSections[sectionIndex]?.negativeMarks || 0
-  //     }
-  //   });
-
-  //   dialogRef.afterClosed().subscribe(result => {
-  //     if (result) {
-  //       this.formSections[sectionIndex] = {
-  //         ...this.formSections[sectionIndex],
-  //         positiveMarks: result.positiveMarks,
-  //         negativeMarks: result.negativeMarks
-  //       };
-  //     }
-  //   });
-  // }
-
-  // get filteredElements() {
-  //   if (this.formSettings?.isQuiz) {
-  //     return this.elements.filter(el =>
-  //       ['TEXT', 'CHECKBOX', 'DROPDOWN', 'RADIO'].includes(el.type)
-  //     );
-  //   }
-  //   return this.elements;
-  // }
-
-  // setCorrectOption(field: any, index: number) {
-  //   field.options.forEach((opt: any, i: number) => {
-  //     opt.isCorrect = i === index;
-  //   });
-  // }
 }

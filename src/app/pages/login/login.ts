@@ -16,6 +16,7 @@ import { GithubAuthButton } from "../../components/github-auth-button/github-aut
 export class Login {
   username: string = '';
   password: string = '';
+  returnUrl: string = '/home';
 
   constructor(
     private router: Router,
@@ -23,6 +24,13 @@ export class Login {
     private toastr:ToastrService,
     private route: ActivatedRoute,
   ) {}
+
+  ngOnInit() {
+  this.route.queryParams.subscribe(params => {
+    this.returnUrl = params['returnUrl'] || '/home';
+    console.log('Detected returnUrl:', this.returnUrl)
+  });
+}
 
   onLogin() {
     if (!this.username || !this.password) {
@@ -43,8 +51,7 @@ export class Login {
       .subscribe({
         next: (res) => {
           // this.router.navigate(['/home']);
-          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
-          this.router.navigateByUrl(returnUrl);
+          this.router.navigateByUrl(this.returnUrl);
           this.toastr.success("LoggedIn sucessfully")
         },
         error: (err) => {
