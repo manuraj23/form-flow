@@ -1,9 +1,9 @@
 <div class="flex h-screen flex-col overflow-hidden bg-white-100">
   <div class="h-16 bg-container flex items-center justify-between px-4 md:px-8 shadow-sm shrink-0">
     <input [(ngModel)]="formTitle"
-      class="hidden sm:block text-lg md:text-xl font-bold border-none focus:ring-0 text-primary w-1/3"
+      class="sm:block text-lg md:text-xl font-bold border-none focus:ring-0 text-primary w-1/3"
       placeholder="Form Title">
-    <div class="flex gap-1 md:gap-4 items-center">
+    <div class="flex gap-1 md:gap-4">
       <app-theme-selector matTooltip="Theme"></app-theme-selector>
       <button mat-icon-button (click)="openSettings()" matTooltip="Form Settings">
         <mat-icon>settings</mat-icon>
@@ -12,12 +12,15 @@
         <mat-icon class="text-sm">visibility</mat-icon>
       </button>
       @if(mode === 'version'&& parentid) {
+        <div class="flex items-center gap-3">
       <button mat-button class="btn-primary action-button" matTooltip="Publish Version" (click)="saveVersion(false)">
         <mat-icon>save</mat-icon>
         <span class="hidden sm:inline">Publish Version</span>
       </button>
+      </div>
       }
       @else{
+        <div class="flex items-center gap-3">
       <button mat-button class="btn-primary action-button" matTooltip="Save Draft" (click)="saveForm(false)">
         <mat-icon>save</mat-icon>
         <span class="hidden sm:inline">Draft</span>
@@ -26,6 +29,7 @@
         <mat-icon>rocket</mat-icon>
         <span class="hidden sm:inline">Publish</span>
       </button>
+      </div>
       }
     </div>
   </div>
