@@ -4,4 +4,5 @@ export interface FormResponseData {
   response: Record<string, any>;
   submittedAt: Date;
   submittedBy: string;
+  score: number; // must exist
 }
