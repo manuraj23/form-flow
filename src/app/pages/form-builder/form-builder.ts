@@ -73,6 +73,8 @@ export class FormBuilder {
   predefinedColours: string[] = ['#000000', '#EF4444', '#10B981', '#3B82F6'];
   mode: string = '';
   parentid: string | null = null;
+ 
+  editingForm: any;
 
   constructor(
     private dialog: MatDialog,
@@ -117,6 +119,9 @@ export class FormBuilder {
     this.formService.getFormById(formId).subscribe({
       next: (form) => {
         console.log(form);
+        this.editingForm = form;
+        this.parentid = form.mainParentId || form.id || null;
+        console.log('Parent ID set to:', this.parentid);
         localStorage.setItem('prevTheme', localStorage.getItem('theme') || 'theme-pink');
         localStorage.setItem('theme', form.theme);
         this.themeService.loadTheme();
@@ -147,8 +152,10 @@ export class FormBuilder {
                 isScored: false,
               }
             })),
+            
         }));
         this.formSections = [...this.formSections];
+        
         this.cd.detectChanges();
       },
       error: (err) => {
@@ -471,25 +478,51 @@ export class FormBuilder {
     }
 
     const formToSave = {
+      id: this.editingFormId,
       title: this.formTitle,
       description: this.formDescription,
       sections: this.formSections,
-      published: true,
+      published: isPublished,
       settings: this.formSettings,
       mainParentId: this.parentid,
     };
     console.log(formToSave);
     console.log('Parent id:', formToSave.mainParentId);
 
+    if(this.editingForm.editable){
+      this.formService.updateForm(formToSave).subscribe({
+        next: (response) => {
+          if (!isPublished) { 
+            this.toastr.success('Form Version Updated Successfully to Database!');
+            this.router.navigate(['/versions', this.editingFormId]);
+          }
+          else{
+            this.toastr.success('Form Version is Published!');
+            this.router.navigate(['/']);
+          }
+        },
+        error: (err) => {
+        console.error(err);
+        this.toastr.error('Error saving form.');
+        },
+      });
+    }
+
+    else{
     this.formService.createForm(formToSave).subscribe({
       next: (response) => {
         if (!isPublished) {
-          this.toastr.success('Form Saved Successfully to Database!');
+          this.toastr.success('Form Version saved successully,');
         } else {
-          this.toastr.success('Form is Published!');
+          this.toastr.success('Form Version is Published!');
         }
 
+        if(isPublished){
         this.router.navigate(['/']);
+        }
+         else{
+          this.router.navigate(['/versions', this.editingFormId]);
+         }
       },
       error: (err) => {
         console.error(err);
@@ -497,6 +530,7 @@ export class FormBuilder {
       },
     });
 
+  }
     localStorage.setItem('theme', localStorage.getItem('prevTheme') || 'theme-pink');
     localStorage.removeItem('prevTheme');
     this.themeService.loadTheme();

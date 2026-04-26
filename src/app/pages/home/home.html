@@ -1,8 +1,14 @@
 <div class="home">
   <!--navbar-->
   <div class="navbar">
+    <div class="left-nav">
+    <!-- Hamburger icon -->
+    <button class="menu-btn" (click)="toggleSidebar()">
+      <mat-icon>menu</mat-icon>
+    </button>
     <h1>FormFlow</h1>
-    <h3>Dashboard</h3>
+    <h3 >Dashboard</h3>
+    </div>
     <div class="nav-profile">
       <button class="create" type="button" [routerLink]="['/create']">Create New</button>
       <app-theme-selector></app-theme-selector>
@@ -20,11 +26,13 @@
     </div>
   </div>
 
+   <div class="overlay" *ngIf="isSidebarOpen" (click)="toggleSidebar()"></div>
+
   <!--Dashboard-->
 
   <div class="dashboard">
     <!--sidebar-->
-    <div class="sidebar">
+    <div class="sidebar" [class.open]="isSidebarOpen">
       <ul>
         <li (click)="activesection = 'MyForm'" [class.active]="activesection == 'MyForm'">
           <mat-icon>folder</mat-icon>

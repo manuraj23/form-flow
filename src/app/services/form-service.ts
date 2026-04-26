@@ -97,6 +97,7 @@ export class FormService {
 
   updateForm(formData: any): Observable<any> {
     const mappedData = this.mapToFormSchema(formData);
+    console.log('Updating form with ID:', formData.id);
     let data: any = this.http.put(this.url + 'user/updateForm/' + formData.id, mappedData, {
       responseType: 'text',
     });
