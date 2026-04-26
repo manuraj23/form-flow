@@ -200,6 +200,7 @@ deleteVersion(formId: string, versionId: number){
               this.updatePagination();
               this.cd.detectChanges();
               this.toastr.success('Form moved to trash!');
+              this.router.navigate(['/home']);
             },
             error: (err) => {
               console.error(err);
