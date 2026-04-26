@@ -1,6 +1,11 @@
-<button mat-icon-button [matMenuTriggerFor]="menu">
+<span matTooltip="Select Theme" matTooltipPosition="below">
+  <button
+    mat-icon-button
+    [matMenuTriggerFor]="menu"
+  >
     <mat-icon>color_lens</mat-icon>
-</button>
+  </button>
+</span>
 
 <mat-menu #menu="matMenu">
   <div class="grid grid-cols-4 gap-x-2 p-4">

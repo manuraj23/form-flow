@@ -40,6 +40,8 @@ export class Assign {
   viewerCount: number = 0;
   searchedGroups: any[]= [];
   allGroups: any[] = [];
+  userCount : number = 0;
+  groupCount : number = 0;
 
   
 
@@ -88,13 +90,34 @@ export class Assign {
   }
 
   updateSummary() {
-    const selected = this.recipients.filter(r => r.selected);
+    const selectedUsers = this.recipients.filter(r => r.selected);
+    const selectedGroups = this.searchedGroups.filter(g => g.selected);
 
-    this.selectedCount = selected.length;
+    // Separate counts
+    this.userCount = selectedUsers.length;
+    this.groupCount = selectedGroups.length;
 
-    this.editorCount = selected.filter(r => r.role === 'Editor').length;
-    this.responderCount = selected.filter(r => r.role === 'Respondent').length;
-    this.viewerCount = selected.filter(r => r.role === 'Viewer').length;
+    // Total (if you still want to show it)
+    this.selectedCount = this.userCount + this.groupCount;
+
+    // Reset role counts
+    this.editorCount = 0;
+    this.responderCount = 0;
+    this.viewerCount = 0;
+
+    // Count users
+    selectedUsers.forEach(r => {
+      if (r.role === 'Editor') this.editorCount++;
+      else if (r.role === 'Respondent') this.responderCount++;
+      else this.viewerCount++;
+    });
+
+    // Count groups
+    selectedGroups.forEach(g => {
+      if (g.role === 'Editor') this.editorCount++;
+      else if (g.role === 'Respondent') this.responderCount++;
+      else this.viewerCount++;
+    });
   }
 
   assignForm() {
@@ -105,7 +128,7 @@ export class Assign {
   }
 
   selectedGroups.forEach(g => {
-    this.formService.assignFormToGroup(g.groupId, this.formId).subscribe({
+    this.formService.assignFormToGroup(g.groupId, this.formId, g.role.toUpperCase()).subscribe({
       next: () => {},
       error: () => {
         this.toastr.error(`Error assigning to group ${g.groupName}`);
@@ -165,7 +188,6 @@ search() {
   const isEmail = this.searchText.includes('@');
 
   if (isEmail) {
-    this.searchedGroups = [];
     this.formService.getUsernameByEmail(this.searchText).subscribe({
       next: (res: any) => {
         if (res === this.form.createdBy) {
@@ -180,7 +202,6 @@ search() {
       }
     });
   } else {
-    this.searchedUser = null;
     const match = this.allGroups.find(g =>
       g.groupName.toLowerCase() === this.searchText.toLowerCase()
     );
@@ -198,6 +219,7 @@ search() {
         selected: true,
         role: 'Respondent'
       });
+      this.updateSummary();
 
     } else {
       this.toastr.error('Group not found');

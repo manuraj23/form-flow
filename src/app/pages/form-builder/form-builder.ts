@@ -255,10 +255,16 @@ export class FormBuilder {
           }
 
         },
-        error: (err) => {
-          console.error(err);
-          this.toastr.error('Error saving form to backend. Check if Spring Boot is running.');
-        },
+          error: (err) => {
+            console.error(err);
+
+            const backendMessage =
+              err?.error?.message ||   // if backend returns {"message":"..."}
+              err?.error ||            // if backend returns plain text
+              'Error updating form';
+
+            this.toastr.error(backendMessage);
+          },
       });
     } else {
       this.formService.createForm(formToSave).subscribe({

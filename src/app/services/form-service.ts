@@ -112,10 +112,9 @@ export class FormService {
     return this.http.get<Form>(this.url + 'public/form/' + id);
   }
 
-   
-  generateForm(promptText: string): Observable<any> {
-    return this.http.post(this.url + 'user/form/generate', {
-      prompt: promptText
+  generateForm(promptText : string): Observable<any> {
+    return this.http.post(this.url + 'ai/generateForm', {
+      prompt : promptText
     });
   }
 
@@ -243,8 +242,8 @@ export class FormService {
     return this.http.put(this.url + 'group/' + groupId + '/update', data, {responseType: 'text'});
   }
 
-  assignFormToGroup(groupId : string, formId : string) {
-    return this.http.post(this.url + `group/${groupId}/assignForm/${formId}`, {});
+  assignFormToGroup(groupId : string, formId : string, role : string) {
+    return this.http.post(this.url + `group/${groupId}/assignForm/${formId}/${role}`, {});
   }
 
 
