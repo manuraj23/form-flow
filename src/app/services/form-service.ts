@@ -111,9 +111,9 @@ export class FormService {
     return this.http.get<Form>(this.url + 'public/form/' + id);
   }
 
-  generateForm(promptText : string): Observable<any> {
+  generateForm(promptText: string): Observable<any> {
     return this.http.post(this.url + 'user/form/generate', {
-      prompt : promptText
+      prompt: promptText
     });
   }
 
@@ -217,31 +217,31 @@ export class FormService {
     return this.http.get(this.url + 'group/myGroups');
   }
 
-  addMembersToGroup(groupId : string, members : string[]) {
-    return this.http.post(`${this.url}group/${groupId}/addMembers`, members, {responseType: 'text'});
+  addMembersToGroup(groupId: string, members: string[]) {
+    return this.http.post(`${this.url}group/${groupId}/addMembers`, members, { responseType: 'text' });
   }
 
-  getGroupMembers(groupId : string) {
+  getGroupMembers(groupId: string) {
     return this.http.get(`${this.url}group/${groupId}/members`);
   }
 
-  removeUsersFromGroup(groupId : string, users : string[]) {
-    return this.http.post(this.url + `group/${groupId}/removeUsers`, users, {responseType: 'text'});
+  removeUsersFromGroup(groupId: string, users: string[]) {
+    return this.http.post(this.url + `group/${groupId}/removeUsers`, users, { responseType: 'text' });
   }
 
-  addAdminsToGroup(groupId : string, emails : string[]) {
-    return this.http.post(this.url + `group/${groupId}/addAdmins`, emails, {responseType: 'text'});
+  addAdminsToGroup(groupId: string, emails: string[]) {
+    return this.http.post(this.url + `group/${groupId}/addAdmins`, emails, { responseType: 'text' });
   }
 
-  getGroupAdmins(groupId : string) {
+  getGroupAdmins(groupId: string) {
     return this.http.get(this.url + `group/${groupId}/admins`);
   }
 
-  updateGroup(groupId : string, data : any) {
-    return this.http.put(this.url + 'group/' + groupId + '/update', data, {responseType: 'text'});
+  updateGroup(groupId: string, data: any) {
+    return this.http.put(this.url + 'group/' + groupId + '/update', data, { responseType: 'text' });
   }
 
-  assignFormToGroup(groupId : string, formId : string) {
+  assignFormToGroup(groupId: string, formId: string) {
     return this.http.post(this.url + `group/${groupId}/assignForm/${formId}`, {});
   }
 
@@ -256,10 +256,15 @@ export class FormService {
   }
 
   // template.service.ts
-useTemplate(templateId: string) {
-  return this.http.post<any>(
-    this.url + 'user/templates/' + templateId + '/use',
-    {}
-  );
-}
+  useTemplate(templateId: string) {
+    return this.http.post<any>(
+      this.url + 'user/templates/' + templateId + '/use',
+      {}
+    );
+  }
+
+  //Quiz API
+  recordQuizStart(formId: string){
+    return this.http.post(this.url + 'api/responses/timerStart/' + formId, {});
+  }
 }

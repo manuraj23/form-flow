@@ -60,6 +60,10 @@ export class FormSubmission {
   timeLeft: number = 0; // In seconds
   timerInterval: any;
   displayTime: string = '';
+  quizStarted = false;
+  startTime: string | undefined;
+  totalPoints = 0;
+  showProctorWarning = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -95,27 +99,25 @@ export class FormSubmission {
             // this.themeService.setTheme(form.theme);
             // this.themeService.loadTheme();
             this.isReadOnly = false;
-            // this.formService.getResponseFormById(formId).subscribe((res: any) => {
             this.responseCount = form.totalResponses;
-              if (this.checkAvailability(form)) {
-                this.handleTheme(form);
+            if (this.checkAvailability(form)) {
+              this.handleTheme(form);
+              if (this.formStructure.settings?.isQuizMode) {
+                this.totalPoints = this.calculateTotalPoints(form);
+              } else {
                 this.buildReactiveForm();
                 this.setupConditionalLogic();
                 this.isFormReady = true;
                 this.loadDraft(formId);
                 this.setupDraftTimer(formId);
-                if (this.formStructure.settings?.isQuizMode && this.formStructure.settings?.duration > 0) {
-                  this.startTimer(this.formStructure.settings.duration);
-                }
-              } else {
-                this.isClosed = true;
-                this.isFormReady = true;
               }
-              this.cd.detectChanges();
-            // });
+            } else {
+              this.isClosed = true;
+              this.isFormReady = true;
+            }
+            this.cd.detectChanges();
           },
           error: (err) => {
-            //console.error('Could not fetch form:', err);
             this.toastr.error('Error: Form not found on server.');
           },
         });
@@ -276,12 +278,43 @@ export class FormSubmission {
     }
   }
 
+  // QUIZ FUNCTIONS
+
+  calculateTotalPoints(form: Form): number {
+    let points = 0;
+    form.sections?.forEach(section => {
+      section.fields?.forEach(field => {
+        points += (field.quizConfig?.points || 0);
+      });
+    });
+    return points;
+  }
+
+  startQuiz() {
+    this.quizStarted = true;
+    this.isSubmitted = false
+    this.startTime = new Date().toISOString();
+
+    this.buildReactiveForm();
+    this.setupConditionalLogic();
+
+    if (this.formStructure.settings?.duration > 0) {
+      this.startTimer(this.formStructure.settings.duration);
+    }
+    this.initProctoring();
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    this.formService.recordQuizStart(this.formStructure.id).subscribe();
+  }
+
   startTimer(minutes: number) {
     this.timeLeft = minutes * 60;
     this.timerInterval = setInterval(() => {
       if (this.timeLeft > 0) {
         this.timeLeft--;
         this.formatTime();
+        this.cd.detectChanges();
       } else {
         this.handleHardSubmit();
       }
@@ -294,29 +327,71 @@ export class FormSubmission {
     this.displayTime = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   }
 
-  handleHardSubmit() {
-    clearInterval(this.timerInterval);
-    this.toastr.warning('Time is up! Submitting your answers...');
-    this.submitResponse(); 
+  private visibilityHandler = () => {
+    if (document.visibilityState === 'hidden' && this.quizStarted && !this.isSubmitted) {
+      this.handleProctorViolation('Tab switch');
+    }
+  };
+
+  private blurHandler = () => {
+    if (this.quizStarted && !this.isSubmitted) {
+      this.handleProctorViolation('Window focus lost');
+    }
+  };
+
+  initProctoring() {
+    document.addEventListener('visibilitychange', this.visibilityHandler);
+    window.addEventListener('blur', this.blurHandler);
+  }
+
+  stopProctoring() {
+    document.removeEventListener('visibilitychange', this.visibilityHandler);
+    window.removeEventListener('blur', this.blurHandler);
   }
 
   ngOnDestroy() {
     if (this.timerInterval) clearInterval(this.timerInterval);
+    this.stopProctoring(); // Stop listening once component is gone
   }
 
-  submitResponse() {
+  handleProctorViolation(reason: string) {
+    if (this.isSubmitting || this.isSubmitted) return;
+
+    this.showProctorWarning = true;
+
+    setTimeout(() => {
+      this.showProctorWarning = false;
+      if (!this.isSubmitted) {
+        this.submitResponse(true);
+      }
+    }, 3000);
+  }
+
+  handleHardSubmit() {
+    clearInterval(this.timerInterval);
+    this.toastr.warning('Time is up! Submitting your answers...');
+    this.submitResponse(true);
+  }
+
+
+
+  submitResponse(isForced = false) {
     if (this.isReadOnly) {
-      this.toastr.warning('This is a preview. Data is not saved to the database.');
+      this.toastr.warning('This is a preview. Data is not saved.');
       return;
     }
-    if (this.formGroup.valid) {
+    if (this.formGroup.valid || isForced) {
       this.isSubmitting = true;
+
+      if (this.timerInterval) {
+        clearInterval(this.timerInterval);
+      }
+      console.log('PAYLOAD BEING SENT:', JSON.stringify(this.formGroup.value));
 
       this.formService.submitResponse(
         this.formStructure.id,
         this.formGroup.value
       ).subscribe({
-
         next: (res: any) => {
           console.log(res);
 
@@ -327,11 +402,11 @@ export class FormSubmission {
           this.showScore =
             this.formStructure?.settings?.isQuizMode &&
             this.formStructure?.settings?.showScore;
-          console.log(this.showScore);
 
           this.formGroup.reset();
           this.isSubmitting = false;
           this.isSubmitted = true;
+          this.quizStarted = false;
 
           localStorage.removeItem(`form_draft_${this.formStructure.id}`);
         },
