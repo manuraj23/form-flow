@@ -24,6 +24,7 @@ import { FormSettingsSchema } from '../../interfaces/form-settings-schema';
 import { ThemeService } from '../../services/theme-service';
 import { AuthService } from '../../services/auth-service';
 import { Loader } from '../../components/loader/loader';
+import { MatSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-form-submission',
@@ -66,8 +67,10 @@ export class FormSubmission {
   isEditMode = false;
   responseId: string | null = null;
   lastSavedData: any;
-  editableUntil: any;
-  lastEditedAt: any;
+  editableUntil: string = '';
+  lastEditedAt: string = '';
+  isCheckingSubmission = true;
+  hasResponded: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -96,24 +99,16 @@ export class FormSubmission {
           next: (form: Form) => {
             console.log(form);
             this.formStructure = form;
-            console.log(this.formStructure);
-            // if (localStorage.getItem('prevTheme') === null) {
-            //   localStorage.setItem('prevTheme', localStorage.getItem('theme') || 'theme-pink');
-            // }
-            // this.themeService.setTheme(form.theme);
-            // this.themeService.loadTheme();
+            // console.log(this.formStructure);
             this.isReadOnly = false;
             this.responseCount = form.totalResponses;
             if (this.checkAvailability(form)) {
               this.handleTheme(form);
-              if (this.formStructure.settings?.isQuizMode) {
-                this.totalPoints = this.calculateTotalPoints(form);
+              if (this.formStructure.settings?.isPrivate) {
+                this.verifySubmissionCheck(formId, form);
               } else {
-                this.buildReactiveForm();
-                this.setupConditionalLogic();
-                this.isFormReady = true;
-                this.loadDraft(formId);
-                this.setupDraftTimer(formId);
+                // Standard path for Public forms
+                this.finalizeFormInitialization(form, formId);
               }
             } else {
               this.isClosed = true;
@@ -152,6 +147,41 @@ export class FormSubmission {
     }
 
     return true;
+  }
+
+  private verifySubmissionCheck(formId: string, form: Form) {
+    this.formService.checkUserSubmission(formId).subscribe({
+      next: (res: any) => {
+        this.hasResponded = res.hasResponded;
+        if (this.hasResponded) {
+          this.isSubmitted = true;
+          this.isFormReady = true;
+          // this.responseId = res.id;
+          // this.editableUntil = res.editableUntil;
+          // this.lastEditedAt = res.lastEditedAt;
+        } else {
+          this.finalizeFormInitialization(form, formId);
+        }
+        this.cd.detectChanges();
+      },
+      error: () => {
+        this.finalizeFormInitialization(form, formId);
+      }
+    });
+  }
+
+  private finalizeFormInitialization(form: Form, formId: string) {
+    if (this.formStructure.settings?.isQuizMode) {
+      this.totalPoints = this.calculateTotalPoints(form);
+      this.isFormReady = true;
+    } else {
+      this.buildReactiveForm();
+      this.setupConditionalLogic();
+      this.isFormReady = true;
+      this.loadDraft(formId);
+      this.setupDraftTimer(formId);
+    }
+    this.cd.detectChanges();
   }
 
   canEditResponse(): boolean {

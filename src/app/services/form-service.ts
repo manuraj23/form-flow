@@ -113,8 +113,7 @@ export class FormService {
   }
   
   checkUserSubmission(formId: string) {
-    const username = this.getUserId();
-    return this.http.get(this.url + `api/responses/hasResponded/${formId}/${username}`);
+    return this.http.get(this.url + `api/responses/hasResponded/${formId}`);
   }
 
   getResponseFormById(id: string): Observable<Form> {
@@ -293,10 +292,6 @@ export class FormService {
     return guestId;
   }
 
-  // recordQuizStart(formId: string){
-  //   const userId = this.getUserId();
-  //   return this.http.post(this.url + 'api/responses/timerStart/' + formId, {userId});
-  // }
   recordQuizStart(formId: string) {
     const tempUserId = this.getUserId();
 

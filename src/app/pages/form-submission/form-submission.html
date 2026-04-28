@@ -52,83 +52,42 @@
     </div>
 
     @if (isSubmitted) {
-    @if(showScore){
     <div class="text-center p-20 bg-container shadow-xl border border-theme">
-      <h1 class="text-4xl font-black text-primary">Score: {{ response.score }} /
-        {{response.evaluation.maxScore}}</h1>
-      <p class="text-muted mt-2">Submitted on {{ response.submittedAt | date:'medium' }}</p>
-    </div>
-    }
 
-    <!-- <div class="flex gap-4 justify-center mt-8">
-        <button (click)="toggleReview()" class="btn-primary px-6 py-2 rounded-xl font-bold shadow-lg">
-          {{ showReview ? 'HIDE ANSWERS' : 'VIEW ANSWERS' }}
-        </button>
-      </div>
-
-      @if (showReview) {
-      <div class="mt-8 space-y-6 animate-in slide-in-from-top duration-500">
-        <h3 class="text-xl font-bold text-primary border-b pb-2 border-theme">Review Your Answers</h3>
-
-        <div *ngFor="let section of formStructure?.sections">
-          <div *ngFor="let field of section.fields" class="mb-6">
-
-            <div class="p-5 rounded-2xl border bg-surface flex flex-col gap-3"
-              [class.border-green-500]="response.evaluation[field.id]?.correct"
-              [class.border-red-400]="!response.evaluation[field.id]?.correct">
-
-              <div class="flex justify-between items-start">
-                <span class="font-bold text-sm text-primary">{{ field.fieldConfig?.label }}</span>
-                <mat-icon [class.text-green-500]="response.evaluation[field.id]?.correct"
-                  [class.text-red-500]="!response.evaluation[field.id]?.correct">
-                  {{ response.evaluation[field.id]?.correct ? 'check_circle' : 'cancel' }}
-                </mat-icon>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4 text-xs">
-                <div class="p-3 bg-container rounded-lg">
-                  <p class="text-muted uppercase font-bold mb-1">Your Answer</p>
-                  <p class="font-bold" [class.text-red-500]="!response.evaluation[field.id]?.correct">
-                    {{ response.response[field.id] || 'No Response' }}
-                  </p>
-                </div>
-
-                @if (!response.evaluation[field.id]?.correct) {
-                <div class="p-3 bg-green-50 rounded-lg">
-                  <p class="text-green-700 uppercase font-bold mb-1">Correct Answer</p>
-                  <p class="font-bold text-green-800">
-                    {{ response.evaluation[field.id]?.correctAnswer }}
-                  </p>
-                </div>
-                }
-              </div>
-            </div>
-
-          </div>
-        </div>
+      @if (showScore) {
+      <div class="mb-8">
+        <h1 class="text-4xl font-black text-primary">
+          Score: {{ response?.score }} / {{ response?.evaluation?.maxScore }}
+        </h1>
+        <p class="text-muted mt-2">Submitted on {{ response?.submittedAt | date:'medium' }}</p>
       </div>
       }
-    </div> -->
-    @else if ( canEditResponse()){
-    <div class="text-center p-20 bg-container shadow-xl border border-theme">
-      <h1 class="text-3xl font-bold text-primary mb-2">Thank You!</h1>
+
+      <h1 class="text-3xl font-bold text-primary mb-2">
+        {{ hasResponded ? 'Already Submitted' : 'Thank You!' }}
+      </h1>
+
+      @if (canEditResponse()) {
       <p class="text-muted mb-8">Your response has been successfully recorded.</p>
-      <button (click)="enableEditMode()"
-        class="btn-primary px-6 py-2 rounded-xl font-bold">
+      <button (click)="enableEditMode()" class="btn-primary px-6 py-2 rounded-xl font-bold">
         EDIT RESPONSE
       </button>
-      <p class="text-[10px] text-gray-400 mt-2">Available until {{ response.editableUntil | date:'shortTime' }}</p>
-    </div>
-    }
-    @else{
-    <div class="text-center p-20 bg-container shadow-xl border border-theme">
-      <h1 class="text-3xl font-bold text-primary mb-2">Thank You!</h1>
+      <p class="text-[10px] text-gray-400 mt-2 italic">
+        Available until {{ response?.editableUntil | date:'shortTime' }}
+      </p>
+      }
+
+      @else if (!formStructure?.settings?.isPrivate) {
       <p class="text-muted mb-8">Your response has been successfully recorded.</p>
       <button (click)="resetForm()" class="btn-primary px-6 py-2 rounded-xl font-bold">
         SUBMIT ANOTHER RESPONSE
       </button>
+      }
+
+      @else {
+      <p class="text-muted mb-8">Your response has already been recorded.</p>
+      }
     </div>
-    }
     }
 
     @else if (formStructure?.settings?.isPrivate && !isLoggedIn) {
