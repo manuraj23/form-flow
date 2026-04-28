@@ -61,7 +61,7 @@ export class FormService {
     }
   }
 
-  private mapToFormData(formId: string, rawValue: any): FormData {
+  private mapToFormData(formId: string, rawValue: any, responseId?: string | null): FormData {
     const formData = new FormData();
     const cleanedResponse: any = {};
     const files: File[] = [];
@@ -80,12 +80,14 @@ export class FormService {
       'response',
       JSON.stringify({
         formId: formId,
+        responseId: responseId || null,
         response: cleanedResponse,
       }),
     );
     files.forEach((file) => {
       formData.append('files', file);
     });
+    //console.log(formData);
     return formData;
   }
 
@@ -134,8 +136,9 @@ export class FormService {
 
   getFormByStatus() { }
 
-  submitResponse(formId: string, rawValue: any) {
-    const formData = this.mapToFormData(formId, rawValue);
+  submitResponse(formId: string, rawValue: any, responseId?: string | null) {
+    const formData = this.mapToFormData(formId, rawValue, responseId);
+    //console.log(formData);
     return this.http.post(this.url + 'api/responses', formData);
   }
 

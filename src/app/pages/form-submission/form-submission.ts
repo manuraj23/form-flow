@@ -410,16 +410,12 @@ export class FormSubmission {
       if (this.timerInterval) {
         clearInterval(this.timerInterval);
       }
-      // console.log('PAYLOAD BEING SENT:', JSON.stringify(this.formGroup.value));
-
-      const payload = {
-        ...this.formGroup.value,
-        responseId : this.isEditMode ? this.response.id : null
-      }
+      //console.log(this.isEditMode ? this.responseId : null);
 
       this.formService.submitResponse(
         this.formStructure.id,
-        payload
+        this.formGroup.value,
+        this.isEditMode ? this.responseId : null
       ).subscribe({
         next: (res: any) => {
           console.log(res);
@@ -427,6 +423,7 @@ export class FormSubmission {
           this.toastr.success('Response saved successfully!');
 
           this.response = res;
+          this.responseId = res.responseId;
           this.lastSavedData = this.formGroup.value;
         
           this.showScore =
