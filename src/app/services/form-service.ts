@@ -7,6 +7,7 @@ import { ChartData } from '../interfaces/chart-data-response-schema';
 import { FormResponseData } from '../interfaces/form-response-schema';
 import { environment } from '../../environments/environment';
 import { Template } from '../interfaces/formTemplate';
+import { AuthService } from './auth-service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +18,7 @@ export class FormService {
   constructor(
     private http: HttpClient,
     private themeService: ThemeService,
+    private authService: AuthService
   ) { }
 
   mapToFormSchema(rawForm: any): Form {
@@ -264,7 +266,21 @@ export class FormService {
   }
 
   //Quiz API
+  
+  private getUserId() : string | null{
+    const loggedInUser = this.authService.getCurrentUser();
+    if (!loggedInUser) return loggedInUser;
+
+    let guestId = localStorage.getItem('quiz_guest_id');
+    if(!guestId){
+      guestId = crypto.randomUUID();
+      localStorage.setItem('quiz_guest_id', guestId);
+    }
+    return guestId;
+  }
+
   recordQuizStart(formId: string){
-    return this.http.post(this.url + 'api/responses/timerStart/' + formId, {});
+    const userId = this.getUserId();
+    return this.http.post(this.url + 'api/responses/timerStart/' + formId, {userId});
   }
 }

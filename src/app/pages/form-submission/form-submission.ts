@@ -61,7 +61,6 @@ export class FormSubmission {
   timerInterval: any;
   displayTime: string = '';
   quizStarted = false;
-  startTime: string | undefined;
   totalPoints = 0;
   showProctorWarning = false;
 
@@ -292,8 +291,7 @@ export class FormSubmission {
 
   startQuiz() {
     this.quizStarted = true;
-    this.isSubmitted = false
-    this.startTime = new Date().toISOString();
+    this.isSubmitted = false;
 
     this.buildReactiveForm();
     this.setupConditionalLogic();
@@ -305,7 +303,10 @@ export class FormSubmission {
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    this.formService.recordQuizStart(this.formStructure.id).subscribe();
+    this.formService.recordQuizStart(this.formStructure.id).subscribe({
+      next: (res) => console.log('Attempt tracked on server'),
+      error: (err) => this.toastr.error('Failed to initialize quiz session')
+    });
   }
 
   startTimer(minutes: number) {
