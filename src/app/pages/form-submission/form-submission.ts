@@ -24,6 +24,7 @@ import { FormSettingsSchema } from '../../interfaces/form-settings-schema';
 import { ThemeService } from '../../services/theme-service';
 import { AuthService } from '../../services/auth-service';
 import { Loader } from '../../components/loader/loader';
+import { MatSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-form-submission',
@@ -55,8 +56,21 @@ export class FormSubmission {
   responseCount: any;
   isFormReady: boolean = false;
   showReview = false;
-  quizResult: any = null;
+  response: any = null;
   showScore: boolean = false;
+  timeLeft: number = 0; // In seconds
+  timerInterval: any;
+  displayTime: string = '';
+  quizStarted = false;
+  totalPoints = 0;
+  showProctorWarning = false;
+  isEditMode = false;
+  responseId: string | null = null;
+  lastSavedData: any;
+  editableUntil: string = '';
+  lastEditedAt: string = '';
+  isCheckingSubmission = true;
+  hasResponded: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -83,32 +97,26 @@ export class FormSubmission {
       if (formId) {
         this.formService.getResponseFormById(formId).subscribe({
           next: (form: Form) => {
+            console.log(form);
             this.formStructure = form;
-            console.log(this.formStructure);
-            // if (localStorage.getItem('prevTheme') === null) {
-            //   localStorage.setItem('prevTheme', localStorage.getItem('theme') || 'theme-pink');
-            // }
-            // this.themeService.setTheme(form.theme);
-            // this.themeService.loadTheme();
+            // console.log(this.formStructure);
             this.isReadOnly = false;
-            this.formService.getFormResponseById(formId).subscribe((res: any) => {
-              this.responseCount = res.length;
-              if (this.checkAvailability(form)) {
-                this.handleTheme(form);
-                this.buildReactiveForm();
-                this.setupConditionalLogic();
-                this.isFormReady = true;
-                this.loadDraft(formId);
-                this.setupDraftTimer(formId);
+            this.responseCount = form.totalResponses;
+            if (this.checkAvailability(form)) {
+              this.handleTheme(form);
+              if (this.formStructure.settings?.isPrivate) {
+                this.verifySubmissionCheck(formId, form);
               } else {
-                this.isClosed = true;
-                this.isFormReady = true;
+                // Standard path for Public forms
+                this.finalizeFormInitialization(form, formId);
               }
-              this.cd.detectChanges();
-            });
+            } else {
+              this.isClosed = true;
+              this.isFormReady = true;
+            }
+            this.cd.detectChanges();
           },
           error: (err) => {
-            //console.error('Could not fetch form:', err);
             this.toastr.error('Error: Form not found on server.');
           },
         });
@@ -139,6 +147,63 @@ export class FormSubmission {
     }
 
     return true;
+  }
+
+  private verifySubmissionCheck(formId: string, form: Form) {
+    this.formService.checkUserSubmission(formId).subscribe({
+      next: (res: any) => {
+        this.hasResponded = res.hasResponded;
+        if (this.hasResponded) {
+          this.isSubmitted = true;
+          this.isFormReady = true;
+          // this.responseId = res.id;
+          // this.editableUntil = res.editableUntil;
+          // this.lastEditedAt = res.lastEditedAt;
+        } else {
+          this.finalizeFormInitialization(form, formId);
+        }
+        this.cd.detectChanges();
+      },
+      error: () => {
+        this.finalizeFormInitialization(form, formId);
+      }
+    });
+  }
+
+  private finalizeFormInitialization(form: Form, formId: string) {
+    if (this.formStructure.settings?.isQuizMode) {
+      this.totalPoints = this.calculateTotalPoints(form);
+      this.isFormReady = true;
+    } else {
+      this.buildReactiveForm();
+      this.setupConditionalLogic();
+      this.isFormReady = true;
+      this.loadDraft(formId);
+      this.setupDraftTimer(formId);
+    }
+    this.cd.detectChanges();
+  }
+
+  canEditResponse(): boolean {
+    if (this.formStructure?.settings?.isQuizMode || !this.formStructure?.settings?.isPrivate) return false;
+    if (!this.response?.editableUntil) return false;
+
+    const now = new Date().getTime();
+    const deadline = new Date(this.response.editableUntil).getTime();
+    return now < deadline;
+  }
+
+  enableEditMode() {
+    if (this.canEditResponse()) {
+      this.isEditMode = true;
+      this.isSubmitted = false; // Toggles view back to form
+      if (this.lastSavedData) {
+        this.formGroup.patchValue(this.lastSavedData);
+      }
+      this.toastr.info('You are now editing your previous response.');
+    } else {
+      this.toastr.error('The editing window has closed.');
+    }
   }
 
   handleTheme(form: Form) {
@@ -269,35 +334,142 @@ export class FormSubmission {
     }
   }
 
-  submitResponse() {
+  // QUIZ FUNCTIONS
+
+  calculateTotalPoints(form: Form): number {
+    let points = 0;
+    form.sections?.forEach(section => {
+      section.fields?.forEach(field => {
+        points += (field.quizConfig?.points || 0);
+      });
+    });
+    return points;
+  }
+
+  startQuiz() {
+    this.quizStarted = true;
+    this.isSubmitted = false;
+
+    this.buildReactiveForm();
+    this.setupConditionalLogic();
+
+    if (this.formStructure.settings?.duration > 0) {
+      this.startTimer(this.formStructure.settings.duration);
+    }
+    this.initProctoring();
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    this.formService.recordQuizStart(this.formStructure.id).subscribe({
+      next: (res) => console.log('Attempt tracked on server'),
+      error: (err) => this.toastr.error('Failed to initialize quiz session')
+    });
+  }
+
+  startTimer(minutes: number) {
+    this.timeLeft = minutes * 60;
+    this.timerInterval = setInterval(() => {
+      if (this.timeLeft > 0) {
+        this.timeLeft--;
+        this.formatTime();
+        this.cd.detectChanges();
+      } else {
+        this.handleHardSubmit();
+      }
+    }, 1000);
+  }
+
+  formatTime() {
+    const mins = Math.floor(this.timeLeft / 60);
+    const secs = this.timeLeft % 60;
+    this.displayTime = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  }
+
+  private visibilityHandler = () => {
+    if (document.visibilityState === 'hidden' && this.quizStarted && !this.isSubmitted) {
+      this.handleProctorViolation('Tab switch');
+    }
+  };
+
+  private blurHandler = () => {
+    if (this.quizStarted && !this.isSubmitted) {
+      this.handleProctorViolation('Window focus lost');
+    }
+  };
+
+  initProctoring() {
+    document.addEventListener('visibilitychange', this.visibilityHandler);
+    window.addEventListener('blur', this.blurHandler);
+  }
+
+  stopProctoring() {
+    document.removeEventListener('visibilitychange', this.visibilityHandler);
+    window.removeEventListener('blur', this.blurHandler);
+  }
+
+  ngOnDestroy() {
+    if (this.timerInterval) clearInterval(this.timerInterval);
+    this.stopProctoring(); // Stop listening once component is gone
+  }
+
+  handleProctorViolation(reason: string) {
+    if (this.isSubmitting || this.isSubmitted) return;
+
+    this.showProctorWarning = true;
+
+    setTimeout(() => {
+      this.showProctorWarning = false;
+      if (!this.isSubmitted) {
+        this.submitResponse(true);
+      }
+    }, 3000);
+  }
+
+  handleHardSubmit() {
+    clearInterval(this.timerInterval);
+    this.toastr.warning('Time is up! Submitting your answers...');
+    this.submitResponse(true);
+  }
+
+  submitResponse(isForced = false) {
     if (this.isReadOnly) {
-      this.toastr.warning('This is a preview. Data is not saved to the database.');
+      this.toastr.warning('This is a preview. Data is not saved.');
       return;
     }
-    if (this.formGroup.valid) {
+    if (this.formGroup.valid || isForced) {
       this.isSubmitting = true;
 
-      this.formService.submitResponse(
-        this.formStructure.id,
-        this.formGroup.value
-      ).subscribe({
+      if (this.timerInterval) {
+        clearInterval(this.timerInterval);
+      }
+      //console.log(this.isEditMode ? this.responseId : null);
+      const request$ = this.isEditMode && this.responseId
+        ? this.formService.editResponse(this.formStructure.id, this.formGroup.value, this.responseId)
+        : this.formService.submitResponse(this.formStructure.id, this.formGroup.value);
 
+      request$.subscribe({
         next: (res: any) => {
           console.log(res);
+          this.response = res;
+          this.responseId = res.responseId;
+          this.editableUntil = res.editableUntil;
+          this.lastEditedAt = res.lastEditedAt;
 
-          this.toastr.success('Response saved successfully!');
-
-          this.quizResult = res;
+          this.toastr.success(this.isEditMode ? 'Changes saved!' : 'Response saved successfully!');
 
           this.showScore =
             this.formStructure?.settings?.isQuizMode &&
             this.formStructure?.settings?.showScore;
-            console.log(this.showScore);
 
-          this.formGroup.reset();
           this.isSubmitting = false;
           this.isSubmitted = true;
+          this.quizStarted = false;
+          this.isEditMode = false;
 
+          const isEditable = this.formStructure?.settings?.isPrivate && !this.formStructure?.settings?.isQuizMode;
+          if (!isEditable) {
+            this.formGroup.reset();
+          }
           localStorage.removeItem(`form_draft_${this.formStructure.id}`);
         },
 
@@ -308,7 +480,6 @@ export class FormSubmission {
         }
 
       });
-
     } else {
       this.formGroup.markAllAsTouched();
       this.toastr.error('Please fix the errors before submitting.');

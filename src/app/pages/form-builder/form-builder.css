@@ -11,3 +11,10 @@
 .action-button:hover {
     opacity: 1;
 }
+
+@media (max-width: 768px) {
+  .sidebar-container {
+    backdrop-filter: blur(10px);
+    background: rgba(var(--bg-surface-rgb), 0.9);
+  }
+}

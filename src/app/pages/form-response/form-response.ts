@@ -184,9 +184,10 @@ export class FormResponse implements OnInit, AfterViewInit, OnDestroy {
         } else {
           const dynamicKeys = Object.keys(responses[0].response || {});
           // this.displayedColumns = ['slNo', 'submittedAt', ...dynamicKeys];
-          this.displayedColumns = ['slNo', ...(form.settings?.isQuizMode ? ['score'] : []), 'submittedAt',  ...dynamicKeys
+          this.displayedColumns = ['slNo',...(form.settings?.isPrivate ? ['username'] : []), ...(form.settings?.isQuizMode ? ['score'] : []), 'submittedAt',  ...dynamicKeys
 ];
           this.dataSource.data = responses.map((res) => ({
+            username: res.username,
             submittedAt: new Date(res.submittedAt),
               score: res.score,
             ...res.response,

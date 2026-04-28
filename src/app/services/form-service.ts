@@ -1,4 +1,5 @@
 import { HttpClient } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Form } from '../interfaces/form-schema';
 import { Observable, of } from 'rxjs';
@@ -7,7 +8,11 @@ import { ChartData } from '../interfaces/chart-data-response-schema';
 import { FormResponseData } from '../interfaces/form-response-schema';
 import { environment } from '../../environments/environment';
 import { Template } from '../interfaces/formTemplate';
+<<<<<<< HEAD
 import { ChatRequest, ChatResponse } from '../interfaces/aiChatSchema';
+=======
+import { AuthService } from './auth-service';
+>>>>>>> 8945f33fcd8debf8c58ab0b6132eb2d254482c67
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +23,7 @@ export class FormService {
   constructor(
     private http: HttpClient,
     private themeService: ThemeService,
+    private authService: AuthService
   ) { }
 
   mapToFormSchema(rawForm: any): Form {
@@ -59,7 +65,7 @@ export class FormService {
     }
   }
 
-  private mapToFormData(formId: string, rawValue: any): FormData {
+  private mapToFormData(formId: string, rawValue: any, responseId?: string | null): FormData {
     const formData = new FormData();
     const cleanedResponse: any = {};
     const files: File[] = [];
@@ -78,12 +84,14 @@ export class FormService {
       'response',
       JSON.stringify({
         formId: formId,
+        responseId: responseId || null,
         response: cleanedResponse,
       }),
     );
     files.forEach((file) => {
       formData.append('files', file);
     });
+    //console.log(formData);
     return formData;
   }
 
@@ -107,6 +115,10 @@ export class FormService {
 
   getFormById(id: string): Observable<Form> {
     return this.http.get<Form>(this.url + 'user/form/' + id);
+  }
+  
+  checkUserSubmission(formId: string) {
+    return this.http.get(this.url + `api/responses/hasResponded/${formId}`);
   }
 
   getResponseFormById(id: string): Observable<Form> {
@@ -134,8 +146,14 @@ export class FormService {
   getFormByStatus() { }
 
   submitResponse(formId: string, rawValue: any) {
-    const formData = this.mapToFormData(formId, rawValue);
+    const formData = this.mapToFormData(formId, rawValue, null);
+    //console.log(formData);
     return this.http.post(this.url + 'api/responses', formData);
+  }
+
+  editResponse(id: any, rawValue: any, responseId?: string) {
+     const formData = this.mapToFormData(id, rawValue, responseId);
+    return this.http.put(this.url + `api/responses/${responseId}/edit`, formData);
   }
 
   getFormResponseById(id: string) {
@@ -219,35 +237,33 @@ export class FormService {
     return this.http.get(this.url + 'group/myGroups');
   }
 
-  addMembersToGroup(groupId : string, members : string[]) {
-    return this.http.post(`${this.url}group/${groupId}/addMembers`, members, {responseType: 'text'});
+  addMembersToGroup(groupId: string, members: string[]) {
+    return this.http.post(`${this.url}group/${groupId}/addMembers`, members, { responseType: 'text' });
   }
 
-  getGroupMembers(groupId : string) {
+  getGroupMembers(groupId: string) {
     return this.http.get(`${this.url}group/${groupId}/members`);
   }
 
-  removeUsersFromGroup(groupId : string, users : string[]) {
-    return this.http.post(this.url + `group/${groupId}/removeUsers`, users, {responseType: 'text'});
+  removeUsersFromGroup(groupId: string, users: string[]) {
+    return this.http.post(this.url + `group/${groupId}/removeUsers`, users, { responseType: 'text' });
   }
 
-  addAdminsToGroup(groupId : string, emails : string[]) {
-    return this.http.post(this.url + `group/${groupId}/addAdmins`, emails, {responseType: 'text'});
+  addAdminsToGroup(groupId: string, emails: string[]) {
+    return this.http.post(this.url + `group/${groupId}/addAdmins`, emails, { responseType: 'text' });
   }
 
-  getGroupAdmins(groupId : string) {
+  getGroupAdmins(groupId: string) {
     return this.http.get(this.url + `group/${groupId}/admins`);
   }
 
-  updateGroup(groupId : string, data : any) {
-    return this.http.put(this.url + 'group/' + groupId + '/update', data, {responseType: 'text'});
+  updateGroup(groupId: string, data: any) {
+    return this.http.put(this.url + 'group/' + groupId + '/update', data, { responseType: 'text' });
   }
 
   assignFormToGroup(groupId : string, formId : string, role : string) {
     return this.http.post(this.url + `group/${groupId}/assignForm/${formId}/${role}`, {});
   }
-
-
 
   getAllTemplates(): Observable<Template[]> {
     return this.http.get<Template[]>(this.url + 'user/templates');
@@ -258,12 +274,7 @@ export class FormService {
   }
 
   // template.service.ts
-useTemplate(templateId: string) {
-  return this.http.post<any>(
-    this.url + 'user/templates/' + templateId + '/use',
-    {}
-  );
-}
+
 
 
 sendChatMessage(message: string, sessionId?: string | null): Observable<ChatResponse> {
@@ -277,6 +288,44 @@ sendChatMessage(message: string, sessionId?: string | null): Observable<ChatResp
   }
 
 
+
+
+  useTemplate(templateId: string) {
+    return this.http.post<any>(
+      this.url + 'user/templates/' + templateId + '/use',
+      {}
+    );
+  }
+
+
+  //Quiz API
+  
+  private getUserId() : string | null{
+    const loggedInUser = this.authService.getCurrentUser();
+    if (loggedInUser) return null;
+
+    let guestId = localStorage.getItem('quiz_guest_id');
+    if(!guestId){
+      guestId = crypto.randomUUID();
+      localStorage.setItem('quiz_guest_id', guestId);
+    }
+    return guestId;
+  }
+
+  recordQuizStart(formId: string) {
+    const tempUserId = this.getUserId();
+
+    let params = new HttpParams();
+
+    if (tempUserId) {
+      params = params.set('tempUserId', tempUserId);
+    }
+
+    return this.http.post(
+      `${this.url}api/responses/timerStart/${formId}`,
+      null,
+      { params }
+    );
+  }
+
 }
-
-

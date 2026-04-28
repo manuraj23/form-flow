@@ -31,4 +31,5 @@ export interface Form {
   mainParentId?: string;
   settings?: FormSettingsSchema;
   sections: Section[];
+  totalResponses?: number;
 }
