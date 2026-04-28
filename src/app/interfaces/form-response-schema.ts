@@ -5,4 +5,5 @@ export interface FormResponseData {
   submittedAt: Date;
   submittedBy: string;
   score: number; // must exist
+  username : string;
 }
