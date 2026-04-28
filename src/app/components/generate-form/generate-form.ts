@@ -5,6 +5,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
 import { Subject } from 'rxjs';
 import { GenerateFormDialog } from '../dialogs/generate-form-dialog/generate-form-dialog';
+import { AiChatbot } from '../ai-chatbot/ai-chatbot';
 
 @Component({
   selector: 'app-generate-form',
@@ -29,5 +30,11 @@ export class GenerateForm implements OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  openChat(){
+    this.dialog.open(AiChatbot, {
+      width: '480px',
+    });
   }
 }

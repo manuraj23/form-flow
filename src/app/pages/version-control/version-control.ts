@@ -8,11 +8,12 @@ import { FormSubmission } from '../form-submission/form-submission';
 import { ToastrService } from 'ngx-toastr';
 import { DeleteDialog } from '../../components/delete-dialog/delete-dialog';
 import { ConfirmDialog } from '../../components/confirm-dialog/confirm-dialog';
+import { MatTooltip } from '@angular/material/tooltip';
 
 
 @Component({
   selector: 'app-version-control',
-  imports: [MatIcon, NgClass, DatePipe, CommonModule, RouterLink],
+  imports: [MatIcon, NgClass, DatePipe, CommonModule, RouterLink, MatTooltip],
   templateUrl: './version-control.html',
   styleUrl: './version-control.css',
 })

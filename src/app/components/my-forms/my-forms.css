@@ -110,16 +110,51 @@
     text-overflow: ellipsis; /* ... show kare */
 }
 
+
 .actions {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 }
 
-/* Desktop default */
+/* Desktop actions FIXED */
 .desktop-actions {
   display: flex;
-  gap: 6px;
+  align-items: center;
+  gap: 14px; /* 🔥 proper spacing between icons */
+  flex-wrap: nowrap; /* ❌ line break band */
+}
+
+/* Buttons styling */
+.desktop-actions button {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+/* Hover effect */
+.desktop-actions button:hover {
+  background-color: var(--mat-sys-surface-container-high);
+  transform: translateY(-1px);
+}
+
+/* Icon size fix */
+.desktop-actions mat-icon {
+  font-size: 22px;
+}
+
+/* 🔴 DELETE BUTTON FIX */
+.desktop-actions button:last-child mat-icon {
+  color: #ef4444; /* red */
+}
+
+.desktop-actions button:last-child:hover {
+  background-color: #fee2e2; /* light red bg */
 }
 
 .mobile-actions {
@@ -235,7 +270,7 @@ button[disabled] {
 /* 🔹 Pagination Container */
 .pagination-container {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
   gap: 8px;
   margin-top: 20px;

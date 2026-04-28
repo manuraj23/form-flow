@@ -7,6 +7,7 @@ import { ChartData } from '../interfaces/chart-data-response-schema';
 import { FormResponseData } from '../interfaces/form-response-schema';
 import { environment } from '../../environments/environment';
 import { Template } from '../interfaces/formTemplate';
+import { ChatRequest, ChatResponse } from '../interfaces/aiChatSchema';
 
 @Injectable({
   providedIn: 'root',
@@ -263,6 +264,19 @@ useTemplate(templateId: string) {
     {}
   );
 }
+
+
+sendChatMessage(message: string, sessionId?: string | null): Observable<ChatResponse> {
+
+    const body: ChatRequest = {
+      message: message,
+      ...(sessionId && { sessionId }) // only add if exists
+    };
+
+    return this.http.post<ChatResponse>(`${this.url}ai/chat`, body);
+  }
+
+
 }
 
 

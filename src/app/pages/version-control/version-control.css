@@ -262,6 +262,11 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
+button[disabled] {
+  cursor: not-allowed !important;
+  pointer-events: auto !important; /* ❌ ye problem hai */
+  opacity: 0.5;
+}
 .tag {
   display: inline-block;
   padding: 4px 12px;
@@ -323,9 +328,7 @@
 }
 
 
-/* ========================= */
-/* 📱 TABLET VIEW (<= 992px) */
-/* ========================= */
+
 @media (max-width: 992px) {
 
   .content {
@@ -351,9 +354,6 @@
 }
 
 
-/* ========================= */
-/* 📱 MOBILE VIEW (<= 768px) */
-/* ========================= */
 @media (max-width: 768px) {
 
   .version-container {
@@ -369,7 +369,7 @@
     font-size: 14px;
   }
 
-  /* Version Item -> Card Layout */
+
   .version-item {
     flex-direction: column;
     align-items: flex-start;
@@ -413,9 +413,7 @@
 }
 
 
-/* ========================= */
-/* 📱 SMALL MOBILE (<= 480px) */
-/* ========================= */
+
 @media (max-width: 480px) {
 
   .header h1 {

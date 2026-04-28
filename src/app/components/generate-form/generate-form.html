@@ -1,10 +1,25 @@
-<button
-  mat-fab
-  class="generate-fab"
-  matTooltip="Generate form using AI"
-  matTooltipPosition="left"
-  aria-label="Generate form using AI"
-  (click)="openDialog()"
->
-  <mat-icon>auto_awesome</mat-icon>
-</button>
+<div class="fab-container">
+
+  <!-- AI Button -->
+  <button
+    mat-fab
+    class="generate-fab ai-btn"
+    matTooltip="Generate form using AI"
+    matTooltipPosition="left"
+    (click)="openDialog()"
+  >
+    <mat-icon>auto_awesome</mat-icon>
+  </button>
+
+  <!-- Chat Button -->
+  <button
+    mat-fab
+    class="generate-fab chat-btn"
+    matTooltip="Chat Support"
+    matTooltipPosition="left"
+    (click)="openChat()"
+  >
+    <mat-icon>chat</mat-icon>
+  </button>
+
+</div>

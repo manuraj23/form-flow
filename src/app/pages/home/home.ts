@@ -51,4 +51,8 @@ export class Home {
   toggleSidebar() {
   this.isSidebarOpen = !this.isSidebarOpen;
 }
+
+openDialog(){
+  
+}
 }

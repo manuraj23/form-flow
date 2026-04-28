@@ -13,10 +13,11 @@ import { MatMenu, MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { Form } from '../../interfaces/form-schema';
 import { DeleteDialog } from '../delete-dialog/delete-dialog';
 import { ToastrService } from 'ngx-toastr';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-my-forms',
-  imports: [RouterLink, MatIcon, DatePipe, MatDialogModule, MatMenu, MatMenuTrigger, CommonModule, MatMenuModule, MatIconModule
+  imports: [RouterLink, MatIcon, DatePipe, MatDialogModule, MatMenu, MatMenuTrigger, CommonModule, MatMenuModule, MatIconModule, MatTooltip
   ],
   templateUrl: './my-forms.html',
   styleUrl: './my-forms.css',

@@ -59,17 +59,17 @@
       </th>
 
       <mat-menu #statusMenu="matMenu">
-        <button mat-menu-item (click)="filterStatus('all')" class="text-muted hover:text-primary">
+        <button mat-menu-item (click)="filterStatus('all')" class="text-muted hover:text-primary" class="!cursor-pointer">
           All</button
-        ><br />
+        >
         <button
           mat-menu-item
           (click)="filterStatus('published')"
-          class="text-muted hover:text-primary"
+          class="text-muted hover:text-primary" class="!cursor-pointer"
         >
           Published</button
-        ><br />
-        <button mat-menu-item (click)="filterStatus('draft')" class="text-muted hover:text-primary">
+        >
+        <button mat-menu-item (click)="filterStatus('draft')" class="text-muted hover:text-primary" class="!cursor-pointer">
           Draft
         </button>
       </mat-menu>
@@ -80,16 +80,18 @@
       <tr>
         <td>{{ form.title }}</td>
         <td *ngIf="type == 'myForms'">V{{form.versionId}}</td>
-        <td class="flex items-center justify-start gap-x-2">
-          <span>{{ form.responses || 0 }}</span>
-          <button
-            mat-icon-button
-            (click)="seeResponses(form.id)"
-            class="cursor-pointer!"
-          >
-            <mat-icon class="relative top-0.75">list_alt</mat-icon>
-          </button>
-        </td>
+        <td>
+  <div class="response-cell">
+    <span>{{ form.totalResponses || 0 }}</span>
+    <button
+      mat-icon-button
+      (click)="seeResponses(form.id)"
+      class="cursor-pointer!" matTooltip="View Responses"
+    >
+      <mat-icon class="relative top-0.75">list_alt</mat-icon>
+    </button>
+  </div>
+</td>
         <td>
           {{ form.createdAt | date: 'dd/MM/yyyy hh:mm a' }}
           <span
@@ -119,32 +121,34 @@
   <div class="desktop-actions">
     @if (type == 'myForms') {
 
-      <button mat-icon-button (click)="editForm(form.id, form.editable)">
+      <button mat-icon-button (click)="editForm(form.id, form.editable)" class="cursor-pointer!" matTooltip="Edit form">
         <mat-icon>edit</mat-icon>
       </button>
 
-      <button mat-icon-button (click)="shareForm(form.id, form.published)">
+      <button mat-icon-button (click)="shareForm(form.id, form.published)" class="cursor-pointer!" matTooltip="Share link">
         <mat-icon>share</mat-icon>
       </button>
 
-      <button mat-icon-button [routerLink]="['/versions', form.id]">
+      <button mat-icon-button [routerLink]="['/versions', form.id]" class="cursor-pointer!" matTooltip="Versions">
         <mat-icon>history</mat-icon>
       </button>
 
       <button
         mat-icon-button
         [routerLink]="form.settings?.isPrivate ? ['/assign', form.id] : null"
-        [disabled]="!form.settings || !form.settings?.isPrivate">
+        [disabled]="!form.settings || !form.settings?.isPrivate"
+        class="cursor-pointer!" matTooltip="Form Assignment"
+      >
         <mat-icon>assignment</mat-icon>
       </button>
 
-      <button mat-icon-button (click)="deleteForm(form.id)">
+      <button mat-icon-button (click)="deleteForm(form.id)" class="cursor-pointer!" matTooltip="Delete Form">
         <mat-icon class="text-red-500">delete</mat-icon>
       </button>
 
     } @else if (type == 'trash') {
 
-      <button mat-icon-button (click)="restoreForm(form.id)">
+      <button mat-icon-button (click)="restoreForm(form.id)" class="cursor-pointer!" matTooltip="Restore Form">
         <mat-icon>restore</mat-icon>
       </button>
 

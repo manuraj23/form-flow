@@ -101,7 +101,7 @@
         </div>
 
         <div class="actions">
-          <button mat-icon-button (click)="viewVersion(v.FormId)">
+          <button mat-icon-button (click)="viewVersion(v.FormId)" class="!cursor-pointer" matTooltip="View Version">
             <mat-icon>visibility</mat-icon>
           </button>
 
@@ -111,7 +111,7 @@
           <button class="restore-btn" [routerLink]="['/edit-form', v.FormId]" [queryParams]="{ mode: 'version'}" *ngIf="v.editable==true">
             edit
           </button>
-          <button (click)="deleteVersion(v.FormId, v.versionId)" >
+          <button (click)="deleteVersion(v.FormId, v.versionId)" class="!cursor-pointer" matTooltip="Delete Version">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
@@ -120,7 +120,7 @@
 
       <!-- Pagination -->
       <div class="pagination">
-  <button (click)="prevPage()" [disabled]="currentPage === 1"><mat-icon>chevron_left</mat-icon></button>
+  <button (click)="prevPage()" [disabled]="currentPage === 1" matTooltip="prev"><mat-icon>chevron_left</mat-icon></button>
 
   <span>
   Page {{ currentPage }} of {{ totalPages }}
@@ -128,7 +128,7 @@
 
   <button 
   (click)="nextPage()" 
-  [disabled]="currentPage * itemsPerPage >= versions.length">
+  [disabled]="currentPage === totalPages"  matTooltip="next">
   <mat-icon>chevron_right</mat-icon>
 </button>
 </div>

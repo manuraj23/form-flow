@@ -1,0 +1,52 @@
+<div class="chat-container">
+
+  <!-- 🔝 Header -->
+  <div class="chat-header">
+    <h3>AI Assistant</h3>
+    <button mat-icon-button mat-dialog-close (click)="closeDialog()" class="!cursor-pointer">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- 💬 Messages -->
+  <div class="chat-body" #chatBody>
+
+  <div 
+    *ngFor="let msg of messages"
+    class="message"
+    [ngClass]="msg.sender"
+  >
+    <p>{{ msg.text }}</p>
+  </div>
+
+  <!-- 🔄 Loading -->
+  <div class="message bot" *ngIf="isLoading">
+    <p>Typing...</p>
+  </div>
+
+</div>
+
+    <!-- User Message -->
+    <!-- Example -->
+    <!--
+    <div class="message user">
+      <p>Create a feedback form</p>
+    </div>
+    -->
+
+
+  <!-- ⌨️ Input -->
+  <div class="chat-input">
+    <input
+      type="text"
+      placeholder="Type your message..."
+      [(ngModel)]="userMessage"
+      (keyup.enter)="sendMessage()"
+    />
+
+    <button mat-icon-button (click)="sendMessage()" class="!cursor-pointer">
+      <mat-icon>send</mat-icon>
+    </button>
+  </div>
+
+</div>
