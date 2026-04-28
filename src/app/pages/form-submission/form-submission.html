@@ -3,144 +3,168 @@
   <div class="max-w-3xl mx-auto bg-container shadow-xl rounded-3xl overflow-hidden border border-theme">
 
     <div class="bg-primary p-10">
-      <h1 class="text-3xl font-bold text-white rounded-t-lg">{{ formStructure?.title }}</h1>
+      <h1 class="text-3xl font-bold text-white">{{ formStructure?.title }}</h1>
       <p class="opacity-80 mt-2 text-white">{{ formStructure?.description }}</p>
     </div>
 
-    @if (isSubmitted) {
-    @if(showScore){
-    <div class="text-center p-20 bg-container shadow-xl border border-theme">
-      <h1 class="text-4xl font-black text-primary">Score: {{ quizResult.score }} /
-        {{quizResult.evaluation.maxScore}}</h1>
-      <p class="text-muted mt-2">Submitted on {{ quizResult.submittedAt | date:'medium' }}</p>
-      </div>
-      }
-
-      <!-- <div class="flex gap-4 justify-center mt-8">
-        <button (click)="toggleReview()" class="btn-primary px-6 py-2 rounded-xl font-bold shadow-lg">
-          {{ showReview ? 'HIDE ANSWERS' : 'VIEW ANSWERS' }}
-        </button>
-      </div>
-
-      @if (showReview) {
-      <div class="mt-8 space-y-6 animate-in slide-in-from-top duration-500">
-        <h3 class="text-xl font-bold text-primary border-b pb-2 border-theme">Review Your Answers</h3>
-
-        <div *ngFor="let section of formStructure?.sections">
-          <div *ngFor="let field of section.fields" class="mb-6">
-
-            <div class="p-5 rounded-2xl border bg-surface flex flex-col gap-3"
-              [class.border-green-500]="quizResult.evaluation[field.id]?.correct"
-              [class.border-red-400]="!quizResult.evaluation[field.id]?.correct">
-
-              <div class="flex justify-between items-start">
-                <span class="font-bold text-sm text-primary">{{ field.fieldConfig?.label }}</span>
-                <mat-icon [class.text-green-500]="quizResult.evaluation[field.id]?.correct"
-                  [class.text-red-500]="!quizResult.evaluation[field.id]?.correct">
-                  {{ quizResult.evaluation[field.id]?.correct ? 'check_circle' : 'cancel' }}
-                </mat-icon>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4 text-xs">
-                <div class="p-3 bg-container rounded-lg">
-                  <p class="text-muted uppercase font-bold mb-1">Your Answer</p>
-                  <p class="font-bold" [class.text-red-500]="!quizResult.evaluation[field.id]?.correct">
-                    {{ quizResult.response[field.id] || 'No Response' }}
-                  </p>
-                </div>
-
-                @if (!quizResult.evaluation[field.id]?.correct) {
-                <div class="p-3 bg-green-50 rounded-lg">
-                  <p class="text-green-700 uppercase font-bold mb-1">Correct Answer</p>
-                  <p class="font-bold text-green-800">
-                    {{ quizResult.evaluation[field.id]?.correctAnswer }}
-                  </p>
-                </div>
-                }
-              </div>
-            </div>
-
-          </div>
+    <div *ngIf="formStructure?.settings?.isQuizMode && !quizStarted && !isSubmitted && !isClosed" class="p-10">
+      <div class="grid grid-cols-2 gap-4 mb-8">
+        <div class="p-6 bg-primary/5 rounded-2xl border border-theme text-center">
+          <mat-icon class="text-primary mb-1">timer</mat-icon>
+          <p class="text-xs font-bold text-muted uppercase tracking-widest">Duration</p>
+          <p class="text-2xl font-black text-primary">{{ formStructure?.settings?.duration }} Mins</p>
+        </div>
+        <div class="p-6 bg-primary/5 rounded-2xl border border-theme text-center">
+          <mat-icon class="text-primary mb-1">functions</mat-icon>
+          <p class="text-xs font-bold text-muted uppercase tracking-widest">Total Points</p>
+          <p class="text-2xl font-black text-primary">{{ totalPoints }} pts</p>
         </div>
       </div>
-      }
-    </div> -->
-      @else{
-      <div class="text-center p-20 bg-container shadow-xl border border-theme">
-        <h1 class="text-3xl font-bold text-primary mb-2">Thank You!</h1>
-        <p class="text-muted mb-8">Your response has been successfully recorded.</p>
-        <button (click)="resetForm()" class="btn-primary px-6 py-2 rounded-xl font-bold">
-          SUBMIT ANOTHER RESPONSE
-        </button>
+
+      <div class="bg-amber-50 border-l-4 border-amber-400 p-6 mb-8 rounded-r-xl">
+        <h3 class="text-amber-800 font-bold flex items-center gap-2 mb-2">
+          <mat-icon class="text-sm">security</mat-icon> Proctoring Instructions:
+        </h3>
+        <ul class="text-sm text-amber-700 space-y-2 list-disc ml-5">
+          <li><b>Stay on this tab:</b> Switching tabs or windows will trigger an automatic submission.</li>
+          <li><b>Timer:</b> Once started, the timer cannot be paused.</li>
+          <li><b>Hard Submit:</b> If time runs out, your progress will be saved and submitted automatically.</li>
+        </ul>
       </div>
-      }
+
+      <button (click)="startQuiz()"
+        class="w-full btn-primary py-4 rounded-2xl font-bold text-lg shadow-lg hover:scale-[1.01] active:scale-95 transition-all cursor-pointer">
+        START QUIZ
+      </button>
+    </div>
+
+    <div *ngIf="quizStarted && formStructure?.settings?.duration > 0 && !isSubmitted"
+      class="sticky top-0 z-50 bg-white shadow-md p-4 flex justify-between items-center border-b-4 transition-all"
+      [ngClass]="timeLeft < 60 ? 'border-red-500 bg-red-50' : 'border-primary'">
+
+      <div class="flex items-center gap-2">
+        <mat-icon [class.animate-pulse]="timeLeft < 60" [color]="timeLeft < 60 ? 'warn' : 'primary'">alarm</mat-icon>
+        <span class="font-mono text-xl font-bold" [class.text-red-600]="timeLeft < 60">
+          {{ displayTime }}
+        </span>
+      </div>
+      <span class="text-xs uppercase font-bold text-gray-500 tracking-tighter">Time Remaining</span>
+    </div>
+
+    @if (isSubmitted) {
+    <div class="text-center p-20 bg-container shadow-xl border border-theme">
+
+      @if (showScore) {
+      <div class="mb-8">
+        <h1 class="text-4xl font-black text-primary">
+          Score: {{ response?.score }} / {{ response?.evaluation?.maxScore }}
+        </h1>
+        <p class="text-muted mt-2">Submitted on {{ response?.submittedAt | date:'medium' }}</p>
+      </div>
       }
 
-      @else if (formStructure?.settings?.isPrivate && !isLoggedIn) {
-      <div class="text-center p-20 bg-container border border-theme">
-        <mat-icon class="text-6xl text-amber-500 mb-4">lock</mat-icon>
-        <h2 class="text-2xl font-bold mb-2">Private Form</h2>
-        <p class="text-muted mb-6">This form is restricted to registered users. Please log in to continue.</p>
-        <button (click)="logoutAndSwitch()" class="btn-primary px-8 py-3 rounded-xl font-bold">
-          LOG IN TO ACCESS
-        </button>
-      </div>
+      <h1 class="text-3xl font-bold text-primary mb-2">
+        {{ hasResponded ? 'Already Submitted' : 'Thank You!' }}
+      </h1>
+
+      @if (canEditResponse()) {
+      <p class="text-muted mb-8">Your response has been successfully recorded.</p>
+      <button (click)="enableEditMode()" class="btn-primary px-6 py-2 rounded-xl font-bold">
+        EDIT RESPONSE
+      </button>
+      <p class="text-[10px] text-gray-400 mt-2 italic">
+        Available until {{ response?.editableUntil | date:'shortTime' }}
+      </p>
       }
 
-      @else if (isClosed) {
-      <div class="text-center p-20 bg-container border border-theme">
-        <mat-icon class="text-6xl text-red-500 mb-4">event_busy</mat-icon>
-        <h2 class="text-2xl font-bold mb-2">Form Unavailable</h2>
-        <p class="text-muted">{{ closeMessage }}</p>
-      </div>
+      @else if (!formStructure?.settings?.isPrivate) {
+      <p class="text-muted mb-8">Your response has been successfully recorded.</p>
+      <button (click)="resetForm()" class="btn-primary px-6 py-2 rounded-xl font-bold">
+        SUBMIT ANOTHER RESPONSE
+      </button>
       }
 
       @else {
-      @if (formStructure?.settings?.isPrivate) {
-      <div class=" p-4 flex justify-between items-center border-b">
-        <span class="text-sm">Logged in as: <strong>{{ currentUser }}</strong></span>
-        <button mat-button color="primary" class="cursor-pointer" (click)="logoutAndSwitch()">Switch Account</button>
-      </div>
+      <p class="text-muted mb-8">Your response has already been recorded.</p>
       }
+    </div>
+    }
 
-      <form [formGroup]="formGroup" (ngSubmit)="submitResponse()" class="p-10">
-        <div *ngFor="let section of formStructure?.sections" class="mb-12">
-          @if (isSectionVisible(section)) {
-          <h2 class="text-xl font-bold text-primary mb-6 border-b pb-2 border-theme">
-            {{ section.sectionTitle }}
-          </h2>
+    @else if (formStructure?.settings?.isPrivate && !isLoggedIn) {
+    <div class="text-center p-20 bg-container border border-theme">
+      <mat-icon class="text-6xl text-amber-500 mb-4">lock</mat-icon>
+      <h2 class="text-2xl font-bold mb-2">Private Form</h2>
+      <p class="text-muted mb-6">This form is restricted to registered users. Please log in to continue.</p>
+      <button (click)="logoutAndSwitch()" class="btn-primary px-8 py-3 rounded-xl font-bold">
+        LOG IN TO ACCESS
+      </button>
+    </div>
+    }
 
-          <div *ngFor="let field of section.fields" class="mb-8">
-            @if (isFieldVisible(field)) {
-            <label class="block text-sm font-bold text-muted uppercase tracking-wider mb-2"
-              [ngStyle]="getFieldStyle(field.fieldStyle)">
-              {{ field.fieldConfig?.label}}
-              <span *ngIf="field.fieldConfig?.validations?.required" class="text-red-500">*</span>
-            </label>
+    @else if (isClosed) {
+    <div class="text-center p-20 bg-container border border-theme">
+      <mat-icon class="text-6xl text-red-500 mb-4">event_busy</mat-icon>
+      <h2 class="text-2xl font-bold mb-2">Form Unavailable</h2>
+      <p class="text-muted">{{ closeMessage }}</p>
+    </div>
+    }
 
-            <div [ngSwitch]="field.fieldType">
-              <app-input-text *ngSwitchCase="'TEXT'" [fieldConfig]="field.fieldConfig"
-                [control]="getControl(field)"></app-input-text>
-              <app-check-box *ngSwitchCase="'CHECKBOX'" [fieldConfig]="field.fieldConfig"
-                [control]="getControl(field)"></app-check-box>
-              <app-file-upload *ngSwitchCase="'FILE'" [fieldConfig]="field.fieldConfig"
-                [control]="getControl(field)"></app-file-upload>
-              <app-radio-button *ngSwitchCase="'RADIO'" [fieldConfig]="field.fieldConfig"
-                [control]="getControl(field)"></app-radio-button>
-              <app-select-card *ngSwitchCase="'DROPDOWN'" [fieldConfig]="field.fieldConfig"
-                [control]="getControl(field)"></app-select-card>
-              <app-textarea *ngSwitchCase="'TEXTAREA'" [fieldConfig]="field.fieldConfig "
-                [control]="getControl(field)"></app-textarea>
-            </div>
-            }
+    @else if (!formStructure?.settings?.isQuizMode || quizStarted) {
+    <div *ngIf="formStructure?.settings?.isPrivate" class="p-4 flex justify-between items-center border-b">
+      <span class="text-sm">Logged in as: <strong>{{ currentUser }}</strong></span>
+      <button mat-button color="primary" class="cursor-pointer" (click)="logoutAndSwitch()">Switch Account</button>
+    </div>
+
+    <form [formGroup]="formGroup" (ngSubmit)="submitResponse()" class="p-10">
+      <div *ngFor="let section of formStructure?.sections" class="mb-12">
+        @if (isSectionVisible(section)) {
+        <h2 class="text-xl font-bold text-primary mb-6 border-b pb-2 border-theme">{{ section.sectionTitle }}</h2>
+        <div *ngFor="let field of section.fields" class="mb-8">
+          @if (isFieldVisible(field)) {
+          <label class="block text-sm font-bold text-muted uppercase tracking-wider mb-2"
+            [ngStyle]="getFieldStyle(field.fieldStyle)">
+            {{ field.fieldConfig?.label}}
+            <span *ngIf="field.fieldConfig?.validations?.required" class="text-red-500">*</span>
+          </label>
+
+          <div [ngSwitch]="field.fieldType">
+            <app-input-text *ngSwitchCase="'TEXT'" [fieldConfig]="field.fieldConfig"
+              [control]="getControl(field)"></app-input-text>
+            <app-check-box *ngSwitchCase="'CHECKBOX'" [fieldConfig]="field.fieldConfig"
+              [control]="getControl(field)"></app-check-box>
+            <app-file-upload *ngSwitchCase="'FILE'" [fieldConfig]="field.fieldConfig"
+              [control]="getControl(field)"></app-file-upload>
+            <app-radio-button *ngSwitchCase="'RADIO'" [fieldConfig]="field.fieldConfig"
+              [control]="getControl(field)"></app-radio-button>
+            <app-select-card *ngSwitchCase="'DROPDOWN'" [fieldConfig]="field.fieldConfig"
+              [control]="getControl(field)"></app-select-card>
+            <app-textarea *ngSwitchCase="'TEXTAREA'" [fieldConfig]="field.fieldConfig "
+              [control]="getControl(field)"></app-textarea>
           </div>
           }
         </div>
-        <button type="submit" [disabled]="formGroup.invalid"
-          class="w-full btn-primary font-bold py-4 rounded-2xl transition-all shadow-lg opacity-90 hover:opacity-100 cursor-pointer disabled:opacity-50 disabled:grayscale">
-          SUBMIT RESPONSE
-        </button>
-      </form>
-      }
+        }
+      </div>
+      <button type="submit" [disabled]="formGroup.invalid"
+        class="w-full btn-primary font-bold py-4 rounded-2xl transition-all shadow-lg opacity-90 hover:opacity-100 cursor-pointer disabled:opacity-50">
+        <div class="flex items-center justify-center gap-2">
+          <span>{{ isEditMode ? 'UPDATE MY RESPONSE' : 'SUBMIT RESPONSE' }}</span>
+        </div>
+      </button>
+    </form>
+    }
+  </div>
+</div>
+
+<div *ngIf="showProctorWarning"
+  class="fixed inset-0 z-[999] bg-black/70 backdrop-blur-md flex items-center justify-center p-6">
+  <div class="bg-white rounded-3xl p-10 max-w-sm text-center shadow-2xl">
+    <mat-icon class="text-red-600 scale-[3.5] mb-8">security_update_warning</mat-icon>
+    <h2 class="text-2xl font-black text-gray-900">Security Violation!</h2>
+    <p class="text-gray-500 mt-4 mb-6 leading-relaxed">Tab switching is strictly prohibited during the quiz. Returning
+      to quiz window...</p>
+    <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+      <div class="bg-red-600 h-full animate-pulse w-full"></div>
     </div>
   </div>
+</div>
