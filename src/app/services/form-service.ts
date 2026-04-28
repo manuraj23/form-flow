@@ -11,7 +11,6 @@ import { Template } from '../interfaces/formTemplate';
 import { ChatRequest, ChatResponse } from '../interfaces/aiChatSchema';
 import { AuthService } from './auth-service';
 
-
 @Injectable({
   providedIn: 'root',
 })
