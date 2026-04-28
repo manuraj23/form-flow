@@ -15,11 +15,23 @@
 
 /* Summary container */
 .summary {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;              /* space between cards */
     margin: 30px 0;
 }
 
+@media (max-width: 992px) {
+    .summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .summary {
+        grid-template-columns: 1fr;
+    }
+  }
 /* Each card */
 .cards {
     flex: 1;               /* equal width */
@@ -63,6 +75,7 @@
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    overflow-x: auto;
 }
 
 /* Table */
@@ -180,4 +193,13 @@ button[disabled] {
 .pagination-container button:last-child {
   font-weight: 600;
   padding: 0 14px;
+}
+
+
+@media (max-width: 768px) {
+    .form-data-table th,
+    .form-data-table td {
+        font-size: 12px;
+        padding: 10px;
+    }
 }

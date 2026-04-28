@@ -114,8 +114,9 @@
         </td>
         <td>
           <div class="actions">
+            
             @if (type == 'myForms') {
-              <button mat-icon-button [routerLink]="['/edit-form', form.id]" class="!cursor-pointer">
+              <button mat-icon-button  (click)="editForm(form.id, form.editable)" class="!cursor-pointer">
                 <mat-icon>edit</mat-icon>
               </button>
               <button

@@ -282,6 +282,11 @@
   color: #dc3545;
 }
 
+.tag.draft{
+  background-color: gray;
+  color: white;
+}
+
 /* DELETE ALL BUTTON (LEFT PANEL STYLE) */
 .delete-all-btn {
   margin-top: 12px;

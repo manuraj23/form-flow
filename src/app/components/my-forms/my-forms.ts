@@ -7,7 +7,7 @@ import { ShareDialog } from '../share-dialog/share-dialog';
 
 import { FormService } from '../../services/form-service';
 
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatFormField, MatLabel, MatOption, MatSelect } from '@angular/material/select';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 import { Form } from '../../interfaces/form-schema';
@@ -40,6 +40,7 @@ export class MyForms {
     private formService: FormService,
     private cd: ChangeDetectorRef,
     private toastr: ToastrService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -218,5 +219,16 @@ export class MyForms {
   }
 
   this.updatePaginatedForms();
+}
+
+
+editForm(id: string, editable: boolean) {
+  if (editable) {
+    this.router.navigate(['/edit-form', id]);
+  }
+  else{
+    this.toastr.warning("This form is not editable as it has been published. You can create it's version to make changes.");
+    this.router.navigate(['/edit-form', id], { queryParams: { mode: 'version' } });
+  }
 }
 }

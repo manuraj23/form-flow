@@ -52,10 +52,10 @@
         </p>
       </div> -->
 
-      <button class="edit-btn" [routerLink]="['/edit-form', formId]" [queryParams]="{ mode: 'version'}">
+      <!-- <button class="edit-btn" [routerLink]="['/edit-form', formId]" [queryParams]="{ mode: 'version'}">
         <mat-icon>edit</mat-icon>
             edit
-      </button>
+      </button> -->
 
       <!-- DELETE ALL BUTTON -->
 <button 
@@ -86,8 +86,9 @@
         <div class="details">
           <div class="top">
             <h4>V{{v.versionId}}</h4>
-            <span class="tag" [ngClass]="v.published ? 'active' : 'inactive'">
-  {{ v.published ? 'active' : 'inactive' }}
+            <span class="tag"
+      [ngClass]="v.editable ? 'draft' : (v.published ? 'active' : 'inactive')">
+  {{ v.editable ? 'draft' : (v.published ? 'active' : 'inactive') }}
 </span>
           </div>
 
@@ -104,8 +105,14 @@
             <mat-icon>visibility</mat-icon>
           </button>
 
-          <button class="restore-btn" (click)="restoreVersion(v.FormId, v.versionId, v.published)">
+          <button class="restore-btn" (click)="restoreVersion(v.FormId, v.versionId, v.published)" *ngIf="v.editable==false">
             Restore
+          </button>
+          <button class="restore-btn" [routerLink]="['/edit-form', v.FormId]" [queryParams]="{ mode: 'version'}" *ngIf="v.editable==true">
+            edit
+          </button>
+          <button (click)="deleteVersion(v.FormId, v.versionId)" >
+            <mat-icon>delete</mat-icon>
           </button>
         </div>
 

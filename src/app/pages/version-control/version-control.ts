@@ -7,6 +7,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormSubmission } from '../form-submission/form-submission';
 import { ToastrService } from 'ngx-toastr';
 import { DeleteDialog } from '../../components/delete-dialog/delete-dialog';
+import { ConfirmDialog } from '../../components/confirm-dialog/confirm-dialog';
 
 
 @Component({
@@ -31,15 +32,15 @@ export class VersionControl {
   ngOnInit(){
      this.formId= this.route.snapshot.paramMap.get('id')!;
      console.log(this.formId);
-      this.getformDetails(this.formId);
+     this.getformDetails(this.formId);
   }
 
   getformDetails(formid: string){
     this.formService.getFormById(formid).subscribe((form: any) => {
         console.log(form);
         this.selectedForm = form;
-        this.getallVersions();
         console.log("selected form parent id: ",this.selectedForm.mainParentId );
+        this.getallVersions();
         this.cd.detectChanges();
       });
   }
@@ -55,9 +56,9 @@ export class VersionControl {
        }
       this.updatePagination(); 
         this.cd.detectChanges();
-
      });
     
+     
   }
 
 
@@ -109,22 +110,36 @@ export class VersionControl {
  
 
   restoreVersion(formId: string, versionId: number, status: boolean){
-    if(status==true){
-      this.toastr.warning('Already active versions cannot be restored.');
-      return;
+    if (status == true) {
+    this.toastr.warning('Already active versions cannot be restored.');
+    return;
+  }
+
+  const dialogRef = this.dialog.open(ConfirmDialog, {
+    width: '450px',
+    data: {}
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      // ✅ User clicked YES
+      this.formService.switchVersion(formId, versionId).subscribe({
+        next: (res) => {
+          console.log(res);
+          this.toastr.success('Version switched successfully!');
+
+          // ✅ Redirect to home page
+          this.router.navigate(['/home']);
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastr.error('Failed to switch version. Please try again.');
+        }
+      });
     }
-    this.formService.switchVersion(formId, versionId).subscribe({
-  next: (res) => {
-    console.log(res);
-    this.toastr.success('Version switched successfully!');
-    this.getformDetails(formId);
-  },
-  error: (err) => {
-    console.error(err);
-    this.toastr.error('Failed to switch version. Please try again.');
-  }
-});
-  }
+  });
+
+}
 
 
 
@@ -170,6 +185,31 @@ deleteAllVersions(parentId: string){
       });
     }
   });
+}
+
+
+deleteVersion(formId: string, versionId: number){
+  this.dialog
+      .open(DeleteDialog)
+      .afterClosed()
+      .subscribe((result) => {
+        if (result) {
+          this.formService.deleteFormById(formId).subscribe({
+            next: () => {
+              this.versions = this.versions.filter((v) => v.versionId !== versionId);
+              this.updatePagination();
+              this.cd.detectChanges();
+              this.toastr.success('Form moved to trash!');
+              this.router.navigate(['/home']);
+            },
+            error: (err) => {
+              console.error(err);
+              this.toastr.error('Error moving form to trash.');
+            },
+          });
+        }
+      }); 
+
 }
 
 }

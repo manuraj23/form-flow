@@ -22,6 +22,9 @@ import { Templates } from '../../components/templates/templates';
 })
 export class Home {
   activesection = 'MyForm';
+  isSidebarOpen = false;
+
+
 
   constructor(
     private themeService: ThemeService,
@@ -44,4 +47,8 @@ export class Home {
       if (confirmed) this.router.navigate(['/logout']);
     });
   }
+
+  toggleSidebar() {
+  this.isSidebarOpen = !this.isSidebarOpen;
+}
 }
