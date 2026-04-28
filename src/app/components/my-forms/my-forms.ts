@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, Input } from '@angular/core';
 import { FORMS_DATA } from '../../data/form-data';
-import { MatIcon } from '@angular/material/icon';
+import { MatIcon, MatIconModule } from '@angular/material/icon';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ShareDialog } from '../share-dialog/share-dialog';
@@ -9,14 +9,15 @@ import { FormService } from '../../services/form-service';
 
 import { Router, RouterLink } from '@angular/router';
 import { MatFormField, MatLabel, MatOption, MatSelect } from '@angular/material/select';
-import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
+import { MatMenu, MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { Form } from '../../interfaces/form-schema';
 import { DeleteDialog } from '../delete-dialog/delete-dialog';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-my-forms',
-  imports: [RouterLink, MatIcon, DatePipe, MatDialogModule, MatMenu, MatMenuTrigger, CommonModule],
+  imports: [RouterLink, MatIcon, DatePipe, MatDialogModule, MatMenu, MatMenuTrigger, CommonModule, MatMenuModule, MatIconModule
+  ],
   templateUrl: './my-forms.html',
   styleUrl: './my-forms.css',
 })
@@ -67,7 +68,7 @@ export class MyForms {
     this.forms = this.sortFormsByDate(data);
     this.totalFormsarray = data;
     this.loadSummary();
-    
+
     this.loadPagination(); 
   });
 }

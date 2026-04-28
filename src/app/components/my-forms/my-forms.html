@@ -114,52 +114,94 @@
         </td>
         <td>
           <div class="actions">
-            
-            @if (type == 'myForms') {
-              <button mat-icon-button  (click)="editForm(form.id, form.editable)" class="!cursor-pointer">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button
-                mat-icon-button
-                (click)="shareForm(form.id, form.published)"
-                class="!cursor-pointer"
-              >
-                <mat-icon>share</mat-icon>
-              </button>
+
+  <!-- 🔹 Desktop Actions -->
+  <div class="desktop-actions">
+    @if (type == 'myForms') {
+
+      <button mat-icon-button (click)="editForm(form.id, form.editable)">
+        <mat-icon>edit</mat-icon>
+      </button>
+
+      <button mat-icon-button (click)="shareForm(form.id, form.published)">
+        <mat-icon>share</mat-icon>
+      </button>
+
+      <button mat-icon-button [routerLink]="['/versions', form.id]">
+        <mat-icon>history</mat-icon>
+      </button>
+
+      <button
+        mat-icon-button
+        [routerLink]="form.settings?.isPrivate ? ['/assign', form.id] : null"
+        [disabled]="!form.settings || !form.settings?.isPrivate">
+        <mat-icon>assignment</mat-icon>
+      </button>
+
+      <button mat-icon-button (click)="deleteForm(form.id)">
+        <mat-icon class="text-red-500">delete</mat-icon>
+      </button>
+
+    } @else if (type == 'trash') {
+
+      <button mat-icon-button (click)="restoreForm(form.id)">
+        <mat-icon>restore</mat-icon>
+      </button>
+
+    }
+  </div>
 
 
-              <button mat-icon-button [routerLink]="['/versions', form.id]"  class="!cursor-pointer">
-                <mat-icon>history</mat-icon>
-              </button>
-            
-        
+  <!-- 🔹 Mobile Three Dots -->
+  <div class="mobile-actions">
+    <button mat-icon-button [matMenuTriggerFor]="actionMenu"  panelClass="menu-btn">
+      <mat-icon>more_vert</mat-icon>
+    </button>
 
-              <button
-                mat-icon-button
-                [routerLink]="form.settings?.isPrivate ? ['/assign', form.id] : null"
-                [disabled]="!form.settings || !form.settings?.isPrivate"
-                style="cursor: pointer"
-              >
+    <mat-menu #actionMenu="matMenu" class="custom-menu">
 
-                <mat-icon>assignment</mat-icon>
-              </button>
+      @if (type == 'myForms') {
 
-              <mat-icon
-                (click)="deleteForm(form.id)"
-                class="!text-red-500 hover:text-red-700 cursor-pointer"
-                >delete</mat-icon
-              >
-            } @else if (type == 'trash') {
-              <button mat-icon-button (click)="restoreForm(form.id)" class="!cursor-pointer">
-                <mat-icon>restore</mat-icon>
-              </button>
+        <button mat-menu-item (click)="editForm(form.id, form.editable)">
+          <mat-icon>edit</mat-icon>
+          <span>Edit</span>
+        </button>
 
-              <!-- <mat-icon
-              (click)="permanentDeleteForm(form.id)"
-              class="!text-red-500 hover:text-red-700 cursor-pointer"
-              >delete_forever</mat-icon> -->
-            }
-          </div>
+        <button mat-menu-item (click)="shareForm(form.id, form.published)">
+          <mat-icon>share</mat-icon>
+          <span>Share</span>
+        </button>
+
+        <button mat-menu-item [routerLink]="['/versions', form.id]">
+          <mat-icon>history</mat-icon>
+          <span>Versions</span>
+        </button>
+
+        <button mat-menu-item 
+          [routerLink]="form.settings?.isPrivate ? ['/assign', form.id] : null"
+          [disabled]="!form.settings || !form.settings?.isPrivate">
+          <mat-icon>assignment</mat-icon>
+          <span>Assign</span>
+        </button>
+
+        <button mat-menu-item (click)="deleteForm(form.id)">
+          <mat-icon class="text-red-500">delete</mat-icon>
+          <span>Delete</span>
+        </button>
+
+      } @else if (type == 'trash') {
+
+        <button mat-menu-item (click)="restoreForm(form.id)">
+          <mat-icon>restore</mat-icon>
+          <span>Restore</span>
+        </button>
+
+      }
+
+    </mat-menu>
+  </div>
+
+</div>
         </td>
       </tr>
     }

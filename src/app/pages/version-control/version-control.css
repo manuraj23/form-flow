@@ -321,3 +321,134 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+
+/* ========================= */
+/* 📱 TABLET VIEW (<= 992px) */
+/* ========================= */
+@media (max-width: 992px) {
+
+  .content {
+    flex-direction: column;
+  }
+
+  .left-card,
+  .right-card {
+    width: 100%;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .create-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+}
+
+
+/* ========================= */
+/* 📱 MOBILE VIEW (<= 768px) */
+/* ========================= */
+@media (max-width: 768px) {
+
+  .version-container {
+    padding: 10px;
+  }
+
+  /* Header */
+  .header h1 {
+    font-size: 26px;
+  }
+
+  .header p {
+    font-size: 14px;
+  }
+
+  /* Version Item -> Card Layout */
+  .version-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .icon {
+    align-self: flex-start;
+  }
+
+  /* Top section */
+  .top {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* Meta info below */
+  .meta {
+    text-align: left;
+    width: 100%;
+  }
+
+  /* Actions at bottom */
+  .actions {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .actions button {
+    flex: 1;
+    min-width: 40px;
+  }
+
+  /* Restore button full width */
+  .restore-btn {
+    flex: 1;
+    text-align: center;
+  }
+
+}
+
+
+/* ========================= */
+/* 📱 SMALL MOBILE (<= 480px) */
+/* ========================= */
+@media (max-width: 480px) {
+
+  .header h1 {
+    font-size: 22px;
+  }
+
+  .create-btn {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .version-item {
+    padding: 12px;
+  }
+
+  .desc {
+    font-size: 12px;
+  }
+
+  .meta p,
+  .meta small {
+    font-size: 11px;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+}
+
+@media (max-width: 768px) {
+  .actions {
+    justify-content: flex-end;
+  }
+}

@@ -120,7 +120,7 @@
 
       <!-- Pagination -->
       <div class="pagination">
-  <button (click)="prevPage()" [disabled]="currentPage === 1">&lt;</button>
+  <button (click)="prevPage()" [disabled]="currentPage === 1"><mat-icon>chevron_left</mat-icon></button>
 
   <span>
   Page {{ currentPage }} of {{ totalPages }}
@@ -129,7 +129,7 @@
   <button 
   (click)="nextPage()" 
   [disabled]="currentPage * itemsPerPage >= versions.length">
-  &gt;
+  <mat-icon>chevron_right</mat-icon>
 </button>
 </div>
 
