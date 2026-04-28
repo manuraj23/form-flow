@@ -54,9 +54,9 @@
     @if (isSubmitted) {
     @if(showScore){
     <div class="text-center p-20 bg-container shadow-xl border border-theme">
-      <h1 class="text-4xl font-black text-primary">Score: {{ quizResult.score }} /
-        {{quizResult.evaluation.maxScore}}</h1>
-      <p class="text-muted mt-2">Submitted on {{ quizResult.submittedAt | date:'medium' }}</p>
+      <h1 class="text-4xl font-black text-primary">Score: {{ response.score }} /
+        {{response.evaluation.maxScore}}</h1>
+      <p class="text-muted mt-2">Submitted on {{ response.submittedAt | date:'medium' }}</p>
     </div>
     }
 
@@ -74,30 +74,30 @@
           <div *ngFor="let field of section.fields" class="mb-6">
 
             <div class="p-5 rounded-2xl border bg-surface flex flex-col gap-3"
-              [class.border-green-500]="quizResult.evaluation[field.id]?.correct"
-              [class.border-red-400]="!quizResult.evaluation[field.id]?.correct">
+              [class.border-green-500]="response.evaluation[field.id]?.correct"
+              [class.border-red-400]="!response.evaluation[field.id]?.correct">
 
               <div class="flex justify-between items-start">
                 <span class="font-bold text-sm text-primary">{{ field.fieldConfig?.label }}</span>
-                <mat-icon [class.text-green-500]="quizResult.evaluation[field.id]?.correct"
-                  [class.text-red-500]="!quizResult.evaluation[field.id]?.correct">
-                  {{ quizResult.evaluation[field.id]?.correct ? 'check_circle' : 'cancel' }}
+                <mat-icon [class.text-green-500]="response.evaluation[field.id]?.correct"
+                  [class.text-red-500]="!response.evaluation[field.id]?.correct">
+                  {{ response.evaluation[field.id]?.correct ? 'check_circle' : 'cancel' }}
                 </mat-icon>
               </div>
 
               <div class="grid grid-cols-2 gap-4 text-xs">
                 <div class="p-3 bg-container rounded-lg">
                   <p class="text-muted uppercase font-bold mb-1">Your Answer</p>
-                  <p class="font-bold" [class.text-red-500]="!quizResult.evaluation[field.id]?.correct">
-                    {{ quizResult.response[field.id] || 'No Response' }}
+                  <p class="font-bold" [class.text-red-500]="!response.evaluation[field.id]?.correct">
+                    {{ response.response[field.id] || 'No Response' }}
                   </p>
                 </div>
 
-                @if (!quizResult.evaluation[field.id]?.correct) {
+                @if (!response.evaluation[field.id]?.correct) {
                 <div class="p-3 bg-green-50 rounded-lg">
                   <p class="text-green-700 uppercase font-bold mb-1">Correct Answer</p>
                   <p class="font-bold text-green-800">
-                    {{ quizResult.evaluation[field.id]?.correctAnswer }}
+                    {{ response.evaluation[field.id]?.correctAnswer }}
                   </p>
                 </div>
                 }
@@ -109,6 +109,17 @@
       </div>
       }
     </div> -->
+    @else if ( canEditResponse()){
+    <div class="text-center p-20 bg-container shadow-xl border border-theme">
+      <h1 class="text-3xl font-bold text-primary mb-2">Thank You!</h1>
+      <p class="text-muted mb-8">Your response has been successfully recorded.</p>
+      <button (click)="enableEditMode()"
+        class="btn-primary px-6 py-2 rounded-xl font-bold">
+        EDIT RESPONSE
+      </button>
+      <p class="text-[10px] text-gray-400 mt-2">Available until {{ response.editableUntil | date:'shortTime' }}</p>
+    </div>
+    }
     @else{
     <div class="text-center p-20 bg-container shadow-xl border border-theme">
       <h1 class="text-3xl font-bold text-primary mb-2">Thank You!</h1>
@@ -177,7 +188,9 @@
       </div>
       <button type="submit" [disabled]="formGroup.invalid"
         class="w-full btn-primary font-bold py-4 rounded-2xl transition-all shadow-lg opacity-90 hover:opacity-100 cursor-pointer disabled:opacity-50">
-        SUBMIT RESPONSE
+        <div class="flex items-center justify-center gap-2">
+          <span>{{ isEditMode ? 'UPDATE MY RESPONSE' : 'SUBMIT RESPONSE' }}</span>
+        </div>
       </button>
     </form>
     }

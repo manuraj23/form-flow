@@ -138,6 +138,11 @@ export class FormService {
     return this.http.post(this.url + 'api/responses', formData);
   }
 
+  editResponse(id: any, rawValue: any) {
+     const formData = this.mapToFormData(id, rawValue);
+    return this.http.get(this.url + `api/responses/${id}/edit`);
+  }
+
   getFormResponseById(id: string) {
     return this.http.get(this.url + 'api/responses/' + id);
   }

@@ -180,12 +180,8 @@ export class FormBuilder {
         if (result.isQuizMode && result.defaultPointsPerField > 0) {
           this.applyBulkScores(result.defaultPointsPerField);
         }
-
-        // Force immediate UI refresh
-        setTimeout(() => {
-          this.cd.detectChanges();
-        }, 0);
       }
+      this.cd.detectChanges();
     });
   }
 

@@ -55,7 +55,7 @@ export class FormSubmission {
   responseCount: any;
   isFormReady: boolean = false;
   showReview = false;
-  quizResult: any = null;
+  response: any = null;
   showScore: boolean = false;
   timeLeft: number = 0; // In seconds
   timerInterval: any;
@@ -63,6 +63,9 @@ export class FormSubmission {
   quizStarted = false;
   totalPoints = 0;
   showProctorWarning = false;
+  isEditMode = false;
+  responseId: string | null = null;
+  lastSavedData: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -147,6 +150,28 @@ export class FormSubmission {
     }
 
     return true;
+  }
+
+  canEditResponse(): boolean {
+    if (this.formStructure?.settings?.isQuizMode || !this.formStructure?.settings?.isPrivate) return false;
+    if (!this.response?.editableUntil) return false;
+
+    const now = new Date().getTime();
+    const deadline = new Date(this.response.editableUntil).getTime();
+    return now < deadline;
+  }
+
+  enableEditMode() {
+    if (this.canEditResponse()) {
+      this.isEditMode = true;
+      this.isSubmitted = false; // Toggles view back to form
+      if (this.lastSavedData) {
+      this.formGroup.patchValue(this.lastSavedData);
+    }
+      this.toastr.info('You are now editing your previous response.');
+    } else {
+      this.toastr.error('The editing window has closed.');
+    }
   }
 
   handleTheme(form: Form) {
@@ -374,8 +399,6 @@ export class FormSubmission {
     this.submitResponse(true);
   }
 
-
-
   submitResponse(isForced = false) {
     if (this.isReadOnly) {
       this.toastr.warning('This is a preview. Data is not saved.');
@@ -387,19 +410,25 @@ export class FormSubmission {
       if (this.timerInterval) {
         clearInterval(this.timerInterval);
       }
-      console.log('PAYLOAD BEING SENT:', JSON.stringify(this.formGroup.value));
+      // console.log('PAYLOAD BEING SENT:', JSON.stringify(this.formGroup.value));
+
+      const payload = {
+        ...this.formGroup.value,
+        responseId : this.isEditMode ? this.response.id : null
+      }
 
       this.formService.submitResponse(
         this.formStructure.id,
-        this.formGroup.value
+        payload
       ).subscribe({
         next: (res: any) => {
           console.log(res);
 
           this.toastr.success('Response saved successfully!');
 
-          this.quizResult = res;
-
+          this.response = res;
+          this.lastSavedData = this.formGroup.value;
+        
           this.showScore =
             this.formStructure?.settings?.isQuizMode &&
             this.formStructure?.settings?.showScore;
