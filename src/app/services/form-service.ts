@@ -111,6 +111,11 @@ export class FormService {
   getFormById(id: string): Observable<Form> {
     return this.http.get<Form>(this.url + 'user/form/' + id);
   }
+  
+  checkUserSubmission(formId: string) {
+    const username = this.getUserId();
+    return this.http.get(this.url + `api/responses/hasResponded/${formId}/${username}`);
+  }
 
   getResponseFormById(id: string): Observable<Form> {
     return this.http.get<Form>(this.url + 'public/form/' + id);
@@ -136,15 +141,15 @@ export class FormService {
 
   getFormByStatus() { }
 
-  submitResponse(formId: string, rawValue: any, responseId?: string | null) {
-    const formData = this.mapToFormData(formId, rawValue, responseId);
+  submitResponse(formId: string, rawValue: any) {
+    const formData = this.mapToFormData(formId, rawValue, null);
     //console.log(formData);
     return this.http.post(this.url + 'api/responses', formData);
   }
 
-  editResponse(id: any, rawValue: any) {
-     const formData = this.mapToFormData(id, rawValue);
-    return this.http.get(this.url + `api/responses/${id}/edit`);
+  editResponse(id: any, rawValue: any, responseId?: string) {
+     const formData = this.mapToFormData(id, rawValue, responseId);
+    return this.http.put(this.url + `api/responses/${responseId}/edit`, formData);
   }
 
   getFormResponseById(id: string) {

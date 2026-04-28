@@ -66,6 +66,8 @@ export class FormSubmission {
   isEditMode = false;
   responseId: string | null = null;
   lastSavedData: any;
+  editableUntil: any;
+  lastEditedAt: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -166,8 +168,8 @@ export class FormSubmission {
       this.isEditMode = true;
       this.isSubmitted = false; // Toggles view back to form
       if (this.lastSavedData) {
-      this.formGroup.patchValue(this.lastSavedData);
-    }
+        this.formGroup.patchValue(this.lastSavedData);
+      }
       this.toastr.info('You are now editing your previous response.');
     } else {
       this.toastr.error('The editing window has closed.');
@@ -411,30 +413,33 @@ export class FormSubmission {
         clearInterval(this.timerInterval);
       }
       //console.log(this.isEditMode ? this.responseId : null);
+      const request$ = this.isEditMode && this.responseId
+        ? this.formService.editResponse(this.formStructure.id, this.formGroup.value, this.responseId)
+        : this.formService.submitResponse(this.formStructure.id, this.formGroup.value);
 
-      this.formService.submitResponse(
-        this.formStructure.id,
-        this.formGroup.value,
-        this.isEditMode ? this.responseId : null
-      ).subscribe({
+      request$.subscribe({
         next: (res: any) => {
           console.log(res);
-
-          this.toastr.success('Response saved successfully!');
-
           this.response = res;
           this.responseId = res.responseId;
-          this.lastSavedData = this.formGroup.value;
-        
+          this.editableUntil = res.editableUntil;
+          this.lastEditedAt = res.lastEditedAt;
+
+          this.toastr.success(this.isEditMode ? 'Changes saved!' : 'Response saved successfully!');
+
           this.showScore =
             this.formStructure?.settings?.isQuizMode &&
             this.formStructure?.settings?.showScore;
 
-          this.formGroup.reset();
           this.isSubmitting = false;
           this.isSubmitted = true;
           this.quizStarted = false;
+          this.isEditMode = false;
 
+          const isEditable = this.formStructure?.settings?.isPrivate && !this.formStructure?.settings?.isQuizMode;
+          if (!isEditable) {
+            this.formGroup.reset();
+          }
           localStorage.removeItem(`form_draft_${this.formStructure.id}`);
         },
 
@@ -445,7 +450,6 @@ export class FormSubmission {
         }
 
       });
-
     } else {
       this.formGroup.markAllAsTouched();
       this.toastr.error('Please fix the errors before submitting.');
