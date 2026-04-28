@@ -57,14 +57,8 @@ export class MyForms {
       this.loadPagination();
       console.log('Forms Data:', this.forms);
       this.totalFormsarray = data;
-      this.forms.forEach((form: any) => {
-        this.formService.getFormResponseById(form.id).subscribe((res: any) => {
-          form.responses = res.length;
-          this.loadSummary();
-          this.loadPagination();
-          this.cd.detectChanges();
-        });
-      });
+      this.loadSummary(); 
+
     });
   }
 
@@ -72,19 +66,9 @@ export class MyForms {
   this.formService.getTrashForms().subscribe((data: any) => {
     this.forms = this.sortFormsByDate(data);
     this.totalFormsarray = data;
-
-    this.loadPagination(); // already handles pagination
-
-    this.forms.forEach((form: any) => {
-      this.formService.getFormResponseById(form.id).subscribe((res: any) => {
-        form.responses = res.length;
-
-        this.loadSummary();
-        this.updatePaginatedForms(); 
-
-        this.cd.detectChanges();
-      });
-    });
+    this.loadSummary();
+    
+    this.loadPagination(); 
   });
 }
 
