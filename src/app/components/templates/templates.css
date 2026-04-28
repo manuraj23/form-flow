@@ -94,8 +94,8 @@
 
   /* Background image + gradient overlay */
   background: 
-    linear-gradient(to right, rgba(0,0,0,0.65), rgba(0,0,0,0.2)),
-    url('/assets/featured.jpg') center/cover no-repeat;
+    linear-gradient(to right, rgba(0,0,0,0.65), rgba(0,0,0,0.2));
+  background-color: var(--mat-sys-primary-container);
 
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
