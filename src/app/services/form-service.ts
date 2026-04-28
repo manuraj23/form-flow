@@ -8,11 +8,9 @@ import { ChartData } from '../interfaces/chart-data-response-schema';
 import { FormResponseData } from '../interfaces/form-response-schema';
 import { environment } from '../../environments/environment';
 import { Template } from '../interfaces/formTemplate';
-<<<<<<< HEAD
 import { ChatRequest, ChatResponse } from '../interfaces/aiChatSchema';
-=======
 import { AuthService } from './auth-service';
->>>>>>> 8945f33fcd8debf8c58ab0b6132eb2d254482c67
+
 
 @Injectable({
   providedIn: 'root',
