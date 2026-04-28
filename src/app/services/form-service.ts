@@ -1,4 +1,5 @@
 import { HttpClient } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Form } from '../interfaces/form-schema';
 import { Observable, of } from 'rxjs';
@@ -274,7 +275,7 @@ export class FormService {
   
   private getUserId() : string | null{
     const loggedInUser = this.authService.getCurrentUser();
-    if (!loggedInUser) return loggedInUser;
+    if (loggedInUser) return null;
 
     let guestId = localStorage.getItem('quiz_guest_id');
     if(!guestId){
@@ -284,8 +285,24 @@ export class FormService {
     return guestId;
   }
 
-  recordQuizStart(formId: string){
-    const userId = this.getUserId();
-    return this.http.post(this.url + 'api/responses/timerStart/' + formId, {userId});
+  // recordQuizStart(formId: string){
+  //   const userId = this.getUserId();
+  //   return this.http.post(this.url + 'api/responses/timerStart/' + formId, {userId});
+  // }
+  recordQuizStart(formId: string) {
+    const tempUserId = this.getUserId();
+
+    let params = new HttpParams();
+
+    if (tempUserId) {
+      params = params.set('tempUserId', tempUserId);
+    }
+
+    return this.http.post(
+      `${this.url}api/responses/timerStart/${formId}`,
+      null,
+      { params }
+    );
   }
+
 }
