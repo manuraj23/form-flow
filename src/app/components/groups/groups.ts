@@ -299,4 +299,18 @@ export class Groups implements OnInit {
     }
   }
   
+
+  trackByGroup(index: number, group: any) {
+  return group.id;
+}
+
+openSidebar() {
+  this.isSidebarOpen = true;
+  document.body.style.overflow = 'hidden';
+}
+
+closeSidebar() {
+  this.isSidebarOpen = false;
+  document.body.style.overflow = 'auto';
+}
 }

@@ -1,7 +1,7 @@
 .assign-page {
     padding: 25px;
     background-color: var(--mat-sys-surface-container);
-    height: 100vh;
+    min-height: 100vh;
 }
 
 /* HEADER */
@@ -307,4 +307,124 @@ textarea {
 select.role-dropdown:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+
+/* ================= MOBILE RESPONSIVE ================= */
+@media (max-width: 768px) {
+
+    .assign-page {
+        padding: 15px;
+        height: auto; /* ❗ important */
+    }
+
+    /* Stack layout */
+    .content {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .left,
+    .right {
+        width: 100%;
+    }
+
+    /* Header */
+    .header h1 {
+        font-size: 20px;
+    }
+
+    .header p {
+        font-size: 13px;
+    }
+
+    /* Cards */
+    .card {
+        padding: 12px;
+    }
+
+    /* List items */
+    .list .item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .right-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    /* Search result */
+    .search-result {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .search-result button {
+        width: 100%;
+    }
+
+    /* Date box */
+    .date-box {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    /* Textarea */
+    textarea {
+        font-size: 14px;
+    }
+
+    /* Summary */
+    .summary .row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    /* Chips */
+    .audience-breakdown {
+        gap: 6px;
+    }
+
+    /* Button */
+    .assign-btn {
+        padding: 12px;
+        font-size: 14px;
+    }
+}
+
+/* ================= SMALL MOBILE ================= */
+@media (max-width: 480px) {
+
+    .header h1 {
+        font-size: 18px;
+    }
+
+    .card label {
+        font-size: 11px;
+    }
+
+    .form-info .title {
+        font-size: 14px;
+    }
+
+    .form-info .sub {
+        font-size: 11px;
+    }
+
+    .role-dropdown {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .search input {
+        font-size: 13px;
+    }
+
+    textarea {
+        font-size: 13px;
+    }
 }

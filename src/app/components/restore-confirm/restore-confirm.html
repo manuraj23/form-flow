@@ -1,0 +1,14 @@
+<div class="confirm-dialog">
+
+  <h2 mat-dialog-title>Confirm Restore</h2>
+
+  <mat-dialog-content>
+    <p>Are you sure you want to restore this form?</p>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-button class="cancel-btn" (click)="close(false)">Cancel</button>
+    <button mat-raised-button class="yes-btn" (click)="close(true)">Restore</button>
+  </mat-dialog-actions>
+
+</div>

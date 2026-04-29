@@ -14,6 +14,7 @@ import { Form } from '../../interfaces/form-schema';
 import { DeleteDialog } from '../delete-dialog/delete-dialog';
 import { ToastrService } from 'ngx-toastr';
 import { MatTooltip } from '@angular/material/tooltip';
+import { RestoreConfirm } from '../restore-confirm/restore-confirm';
 
 @Component({
   selector: 'app-my-forms',
@@ -134,14 +135,26 @@ export class MyForms {
   }
 
   restoreForm(id: string) {
+
+  const dialogRef = this.dialog.open(RestoreConfirm, {
+    width: '400px'
+  });
+
+  dialogRef.afterClosed().subscribe((result: boolean) => {
+
+    if (!result) return; 
+
     this.formService.restoreForms(id).subscribe({
       next: (data: any) => {
         console.log(data);
+
         this.forms = this.forms.filter((form) => form.id !== id);
         this.totalFormsarray = this.forms;
+
         this.loadSummary();
-       this.adjustPageAfterDelete();
+        this.adjustPageAfterDelete();
         this.cd.detectChanges();
+
         this.toastr.success('Form restored successfully!');
       },
       error: (err: any) => {
@@ -149,7 +162,9 @@ export class MyForms {
         this.toastr.error('Restore failed!');
       },
     });
-  }
+
+  });
+}
 
   filterStatus(status: String) {
     if (status == 'all') {

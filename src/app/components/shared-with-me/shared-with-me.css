@@ -252,3 +252,142 @@
     background: var(--mat-sys-surface);
     color: var(--mat-sys-on-surface);
 }
+
+
+
+/* ================= MOBILE RESPONSIVE ================= */
+@media (max-width: 768px) {
+
+    .shared-container {
+        padding: 10px;
+    }
+
+    /* HEADER */
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .header h2 {
+        font-size: 22px;
+    }
+
+    .header p {
+        font-size: 14px;
+    }
+
+    .header input {
+        width: 100%;
+    }
+
+    /* RECENT CARDS */
+    .card-container {
+        flex-direction: column;
+    }
+
+    .form-card {
+        width: 100%;
+    }
+
+    /* SUMMARY CARDS */
+    .summary {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .cards {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .details h1 {
+        font-size: 20px;
+    }
+
+    /* TABLE SECTION */
+    .table-section {
+        padding: 12px;
+    }
+
+    /* header top */
+    .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    /* filters */
+    .filters input {
+        width: 100%;
+    }
+
+    /* TABLE FIX (IMPORTANT 🔥) */
+    .table-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        padding: 10px;
+    }
+
+    .header-row {
+        display: none; /* hide header on mobile */
+    }
+
+    .table-row div {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+    }
+
+    /* add labels manually */
+    .table-row div::before {
+        font-weight: 600;
+        color: var(--mat-sys-on-surface-variant);
+    }
+
+    .table-row div:nth-child(1)::before { content: "Form"; }
+    .table-row div:nth-child(2)::before { content: "Created"; }
+    .table-row div:nth-child(3)::before { content: "Responses"; }
+    .table-row div:nth-child(4)::before { content: "Status"; }
+    .table-row div:nth-child(5)::before { content: "Action"; }
+
+    /* BUTTON */
+    .open-btn {
+        width: 100%;
+    }
+
+    /* PAGINATION */
+    .pagination {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}
+
+
+/* ================= SMALL MOBILE ================= */
+@media (max-width: 480px) {
+
+    .header h2 {
+        font-size: 18px;
+    }
+
+    .details h1 {
+        font-size: 18px;
+    }
+
+    .cards mat-icon {
+        font-size: 20px;
+    }
+
+    .form-card {
+        padding: 12px;
+    }
+
+    .card-content h4 {
+        font-size: 14px;
+    }
+
+    .card-content p {
+        font-size: 11px;
+    }
+}
