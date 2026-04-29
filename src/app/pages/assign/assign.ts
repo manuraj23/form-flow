@@ -34,7 +34,7 @@ export class Assign {
   selectedCount: number = 0;
   recipients: any[]= [];
   searchedUser: string | null = null;
-  selectedRole: string = 'Respondent';
+  selectedRole: string = '';
   editorCount: number = 0;
   responderCount: number = 0;
   viewerCount: number = 0;
@@ -48,6 +48,9 @@ export class Assign {
   ngOnInit() {
     this.formService.getFormById(this.formId).subscribe(data => {
       this.form = data;
+      console.log(this.form); 
+      console.log('Status:', this.form.status);
+      this.setDefaultRole();
       this.cd.detectChanges();
     });
 
@@ -83,6 +86,22 @@ export class Assign {
       },
       error: () => {}
     });
+  }
+
+  isDraftForm(): boolean {
+    return this.form && !this.form.published;
+  }
+
+  isPublishedForm(): boolean {
+    return this.form && this.form.published;
+  }
+
+  setDefaultRole() : string {
+    this.selectedRole = this.isDraftForm()
+      ? 'Editor'
+      : 'Respondent';
+
+    return this.selectedRole;
   }
 
   filteredRecipients() {
@@ -217,7 +236,7 @@ search() {
       this.searchedGroups.push({
         ...match,
         selected: true,
-        role: 'Respondent'
+        role: this.setDefaultRole()
       });
       this.updateSummary();
 
@@ -238,7 +257,7 @@ addRecipient() {
   this.recipients.push({
     name: this.searchedUser,
     selected: true,
-    role: this.selectedRole
+    role: this.setDefaultRole()
   });
 
   this.updateSummary();
@@ -246,7 +265,7 @@ addRecipient() {
   // reset
   this.searchedUser = null;
   this.searchText = '';
-  this.selectedRole = 'Respondent';
+  this.setDefaultRole();
 }
 
 
