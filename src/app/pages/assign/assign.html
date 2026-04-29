@@ -56,9 +56,15 @@
             <mat-checkbox [(ngModel)]="g.selected" (change)="updateSummary()"></mat-checkbox>
 
             <select class="role-dropdown" [(ngModel)]="g.role" (change)="updateSummary()">
-              <option value="Viewer">Viewer</option>
-              <option value="Respondent">Respondent</option>
-              <option value="Editor">Editor</option>
+              <ng-container *ngIf="isDraftForm()">
+                <option value="Editor">Editor</option>
+                <option value="Viewer">Viewer</option>
+              </ng-container>
+
+              <ng-container *ngIf="isPublishedForm()">
+                <option value="Responder">Respondent</option>
+                <option value="Viewer">Viewer</option>
+              </ng-container>
             </select>
           </div>
         </div>
@@ -78,9 +84,15 @@
                   <mat-checkbox [(ngModel)]="r.selected" (change)="updateSummary()" [disabled]="r.preAssigned"></mat-checkbox>
   
                   <select class="role-dropdown" [(ngModel)]="r.role" (change)="updateSummary()" [disabled]="r.preAssigned">
-                    <option value="Viewer">Viewer</option>
-                    <option value="Respondent">Respondent</option>
-                    <option value="Editor">Editor</option>
+                    <ng-container *ngIf="isDraftForm()">
+                      <option value="Editor">Editor</option>
+                      <option value="Viewer">Viewer</option>
+                    </ng-container>
+
+                    <ng-container *ngIf="isPublishedForm()">
+                      <option value="Responder">Respondent</option>
+                      <option value="Viewer">Viewer</option>
+                    </ng-container>
                   </select>
                 </div>
             </div>

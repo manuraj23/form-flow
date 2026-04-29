@@ -6,6 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { FormSubmission } from '../../pages/form-submission/form-submission';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-templates',
@@ -24,33 +25,39 @@ export class Templates {
     private cd: ChangeDetectorRef,
     private dialog: MatDialog,
     private router: Router,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit() {
     this.formService.getAllTemplates().subscribe((data: Template[]) => {
       this.templates = data;
       this.selectedTemplate = this.templates[0];
-      this.selectTemplate(this.selectedTemplate);
+      //this.selectTemplate(this.selectedTemplate);
+      this.formService.getTemplateById(this.selectedTemplate.id).subscribe((data) => {
+    this.templateDetails = data;
+     });
       this.cd.detectChanges();
     });
   }
 
-  selectTemplate(template: Template, scroll = false) {
-    this.selectedTemplate = template;
-    if (scroll && typeof window !== 'undefined') {
-      try {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } catch (e) {
-        // fallback for older browsers
-        window.scrollTo(0, 0);
-      }
-    }
+  selectTemplate(template: Template) {
+  this.selectedTemplate = template;
 
-    this.formService.getTemplateById(this.selectedTemplate.id).subscribe((data) => {
-      this.templateDetails = data;
-      console.log(this.templateDetails);
-    });
+  // ✅ ALWAYS scroll to top
+  if (typeof window !== 'undefined') {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
   }
+
+  this.formService.getTemplateById(this.selectedTemplate.id).subscribe((data) => {
+    this.templateDetails = data;
+    console.log(this.templateDetails);
+    this.toastr.success("Now you can use and preview the selected Template")
+  });
+}
 
   getImageUrl(imageUrl?: string): string {
     if (!imageUrl) return '';

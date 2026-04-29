@@ -34,7 +34,7 @@ export class Assign {
   selectedCount: number = 0;
   recipients: any[]= [];
   searchedUser: string | null = null;
-  selectedRole: string = 'Respondent';
+  selectedRole: string = '';
   editorCount: number = 0;
   responderCount: number = 0;
   viewerCount: number = 0;
@@ -48,6 +48,9 @@ export class Assign {
   ngOnInit() {
     this.formService.getFormById(this.formId).subscribe(data => {
       this.form = data;
+      console.log(this.form); 
+      console.log('Status:', this.form.status);
+      this.setDefaultRole();
       this.cd.detectChanges();
     });
 
@@ -62,7 +65,7 @@ export class Assign {
           const preAssigned: any[] = [];
 
           editorList.forEach(name => preAssigned.push({ name, selected: true, role: 'Editor', preAssigned: true }));
-          responderList.forEach(name => preAssigned.push({ name, selected: true, role: 'Respondent', preAssigned: true }));
+          responderList.forEach(name => preAssigned.push({ name, selected: true, role: 'Responder', preAssigned: true }));
           viewerList.forEach(name => preAssigned.push({ name, selected: true, role: 'Viewer', preAssigned: true }));
 
           this.recipients = preAssigned;
@@ -83,6 +86,22 @@ export class Assign {
       },
       error: () => {}
     });
+  }
+
+  isDraftForm(): boolean {
+    return this.form && !this.form.published;
+  }
+
+  isPublishedForm(): boolean {
+    return this.form && this.form.published;
+  }
+
+  setDefaultRole() : string {
+    this.selectedRole = this.isDraftForm()
+      ? 'Editor'
+      : 'Responder';
+
+    return this.selectedRole;
   }
 
   filteredRecipients() {
@@ -108,14 +127,14 @@ export class Assign {
     // Count users
     selectedUsers.forEach(r => {
       if (r.role === 'Editor') this.editorCount++;
-      else if (r.role === 'Respondent') this.responderCount++;
+      else if (r.role === 'Responder') this.responderCount++;
       else this.viewerCount++;
     });
 
     // Count groups
     selectedGroups.forEach(g => {
       if (g.role === 'Editor') this.editorCount++;
-      else if (g.role === 'Respondent') this.responderCount++;
+      else if (g.role === 'Responder') this.responderCount++;
       else this.viewerCount++;
     });
   }
@@ -144,7 +163,7 @@ export class Assign {
     if (r.selected) {
       if (r.role === 'Editor') {
         editor.push(r.name);   
-      } else if (r.role === 'Respondent') {
+      } else if (r.role === 'Responder') {
         responder.push(r.name);
       } else {
         viewer.push(r.name);
@@ -217,7 +236,7 @@ search() {
       this.searchedGroups.push({
         ...match,
         selected: true,
-        role: 'Respondent'
+        role: this.setDefaultRole()
       });
       this.updateSummary();
 
@@ -238,7 +257,7 @@ addRecipient() {
   this.recipients.push({
     name: this.searchedUser,
     selected: true,
-    role: this.selectedRole
+    role: this.setDefaultRole()
   });
 
   this.updateSummary();
@@ -246,7 +265,7 @@ addRecipient() {
   // reset
   this.searchedUser = null;
   this.searchText = '';
-  this.selectedRole = 'Respondent';
+  this.setDefaultRole();
 }
 
 

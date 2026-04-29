@@ -505,9 +505,10 @@ export class FormSubmission {
   }
 
   logoutAndSwitch() {
-    this.authService.logout();
+    const currentUrl = this.router.url;
+    this.authService.logout(false);
     this.router.navigate(['/login'], {
-      queryParams: { returnUrl: this.router.url }
+      queryParams: { returnUrl: currentUrl }
     });
   }
 }
