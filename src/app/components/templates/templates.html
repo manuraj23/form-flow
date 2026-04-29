@@ -27,9 +27,9 @@
 
   <!-- 🔹 Grid -->
   <div class="template-grid">
-    <div class="template-card" *ngFor="let item of templates" (click)="selectTemplate(item)">
+    <div class="template-card" *ngFor="let item of templates" (click)="selectTemplate(item, true)">
       <div class="card-image">
-        <img [src]="" />
+        <img [src]="getImageUrl(item.imageUrl)" />
       </div>
 
       <div class="card-content">

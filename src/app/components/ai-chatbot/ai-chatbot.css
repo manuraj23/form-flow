@@ -132,10 +132,25 @@
   40% { opacity: 1; }
 }
 
-
 @media (max-width: 600px) {
   .chat-container {
-    height: 100vh;
-    border-radius: 0;
+    height: 100dvh;
+  }
+
+  .chat-input {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+  }
+
+  .chat-body {
+    min-height: 0;
+    padding-bottom: 70px; /* 👈 IMPORTANT: input ki height jitna space */
+  }
+
+  .chat-input input {
+    font-size: 16px;
   }
 }

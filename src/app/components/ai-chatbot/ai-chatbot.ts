@@ -19,6 +19,7 @@ export class AiChatbot {
   isLoading: boolean = false;
 
   @ViewChild('chatBody') chatBody!: ElementRef;
+  @ViewChild('chatInput') chatInput!: ElementRef;
 
   constructor(
     private formService: FormService,
@@ -126,6 +127,17 @@ export class AiChatbot {
       }
     }, 100);
   }
+
+
+  onFocus() {
+  setTimeout(() => {
+    this.chatInput.nativeElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+  }, 300);
+}
+
 
 closeDialog() {
   this.dialogRef.close();

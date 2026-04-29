@@ -140,7 +140,9 @@ export class FormService {
     return this.http.get<Form[]>(this.url + 'user/allForm');
   }
 
-  getFormByStatus() { }
+  getFormsByStatus(status: string): Observable<Form[]> {
+    return this.http.get<Form[]>(`${this.url}user/status/${status}`);
+  }
 
   submitResponse(formId: string, rawValue: any) {
     const formData = this.mapToFormData(formId, rawValue, null);

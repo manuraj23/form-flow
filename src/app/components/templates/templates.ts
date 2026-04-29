@@ -5,6 +5,7 @@ import { Template } from '../../interfaces/formTemplate';
 import { MatDialog } from '@angular/material/dialog';
 import { FormSubmission } from '../../pages/form-submission/form-submission';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-templates',
@@ -16,6 +17,7 @@ export class Templates {
   templates: Template[] = [];
   selectedTemplate: Template = { id: '', templateName: '', title: '', description: '' };
   templateDetails: any;
+  backendUrl = environment.backendUrl;
 
   constructor(
     private formService: FormService,
@@ -33,12 +35,27 @@ export class Templates {
     });
   }
 
-  selectTemplate(template: Template) {
+  selectTemplate(template: Template, scroll = false) {
     this.selectedTemplate = template;
+    if (scroll && typeof window !== 'undefined') {
+      try {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (e) {
+        // fallback for older browsers
+        window.scrollTo(0, 0);
+      }
+    }
+
     this.formService.getTemplateById(this.selectedTemplate.id).subscribe((data) => {
       this.templateDetails = data;
       console.log(this.templateDetails);
     });
+  }
+
+  getImageUrl(imageUrl?: string): string {
+    if (!imageUrl) return '';
+    const path = imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl;
+    return this.backendUrl + path;
   }
 
   previewTemplate() {
