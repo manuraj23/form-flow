@@ -53,8 +53,6 @@
       <input type="text" placeholder="Search groups..." [(ngModel)]="searchText" (input)="onSearch()" />
     </div>
 
-
-    <div class="table-wrapper">
     <div class="table">
 
       <div class="table-row header-row">
@@ -65,7 +63,7 @@
       </div>
 
       <!-- Group 1 -->
-      <div class="table-row"  *ngFor="let group of paginatedGroups; trackBy: trackByGroup" (click)="selectGroup(group)" [class.selected]="selectedGroup === group" style="cursor: pointer;">
+      <div class="table-row"  *ngFor="let group of paginatedGroups" (click)="selectGroup(group)" [class.selected]="selectedGroup === group" style="cursor: pointer;">
         <span>{{ group.groupName }}</span>
         <span>{{ group.maxMembers }}</span>
         <span>{{ group.createdAt | date:'dd MMM yyyy' }}</span>
@@ -80,7 +78,7 @@
       </div>
 
     </div>
-    </div>
+
     <div class="pagination">
 
       <button (click)="prevPage()" [disabled]="currentPage === 1">
@@ -119,7 +117,6 @@
     </div>
 
     <!-- Table -->
-     <div class="table-wrapper">
     <div class="table">
 
       <div *ngIf="showAddMemberInput" class="table-row add-member-row">
@@ -180,7 +177,7 @@
           </button>
         </span>
       </div>
-      </div>
+      
 
     </div>
   </div>
@@ -204,7 +201,7 @@
   <!-- Header -->
   <div class="sidebar-header">
     <h2>{{ selectedGroupDetails.groupName }}</h2>
-    <button (click)="closeSidebar()">✖</button>
+    <button (click)="isSidebarOpen = false">✖</button>
   </div>
 
   <!-- Image -->
