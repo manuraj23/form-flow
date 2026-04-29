@@ -68,6 +68,7 @@ export class MyForms {
   getTrashFormData() {
   this.formService.getTrashForms().subscribe((data: any) => {
     this.forms = this.sortFormsByDate(data);
+    console.log("deleted forms" ,this.forms)
     this.totalFormsarray = data;
     this.loadSummary();
 
