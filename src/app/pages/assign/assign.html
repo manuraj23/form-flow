@@ -64,7 +64,7 @@
               </ng-container>
 
               <ng-container *ngIf="isPublishedForm()">
-                <option value="Respondent">Respondent</option>
+                <option value="Responder">Respondent</option>
                 <option value="Viewer">Viewer</option>
               </ng-container>
             </select>
@@ -73,40 +73,41 @@
 
         <!-- LIST -->
         <div class="list">
-          <div class="item" *ngFor="let r of filteredRecipients(); let i = index">
-            <div class="left-info">
-              <span class="title">{{ r.name }}</span>
-              <span class="assigned-badge" *ngIf="r.preAssigned">Assigned</span>
-            </div>
+  <div class="item" *ngFor="let r of filteredRecipients(); let i = index">
 
-            <div class="right-group">
-              <mat-checkbox
-                [(ngModel)]="r.selected"
-                (change)="updateSummary()"
-                [disabled]="r.preAssigned"
-              ></mat-checkbox>
-
-              <select
-                class="role-dropdown"
-                [(ngModel)]="r.role"
-                (change)="updateSummary()"
-                [disabled]="r.preAssigned"
-              >
-                <ng-container *ngIf="isDraftForm()">
-                  <option value="Editor">Editor</option>
-                  <option value="Viewer">Viewer</option>
-                </ng-container>
-
-                <ng-container *ngIf="isPublishedForm()">
-                  <option value="Respondent">Respondent</option>
-                  <option value="Viewer">Viewer</option>
-                </ng-container>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="left-info">
+      <span class="title">{{ r.name }}</span>
+      <span class="assigned-badge" *ngIf="r.preAssigned">Assigned</span>
     </div>
+
+    <div class="right-group">
+      <mat-checkbox
+        [(ngModel)]="r.selected"
+        (change)="updateSummary()"
+        [disabled]="r.preAssigned">
+      </mat-checkbox>
+
+      <select
+        class="role-dropdown"
+        [(ngModel)]="r.role"
+        (change)="updateSummary()"
+        [disabled]="r.preAssigned">
+
+        <ng-container *ngIf="isDraftForm()">
+          <option value="Editor">Editor</option>
+          <option value="Viewer">Viewer</option>
+        </ng-container>
+
+        <ng-container *ngIf="isPublishedForm()">
+          <option value="Responder">Respondent</option>
+          <option value="Viewer">Viewer</option>
+        </ng-container>
+
+      </select>
+    </div>
+
+  </div>
+</div>
 
     <!-- RIGHT SECTION -->
     <div class="right">
@@ -165,5 +166,5 @@ Please fill the form</textarea
         <button class="assign-btn" (click)="assignForm()">Assign Form</button>
       </div>
     </div>
-  </div>
+  
 </div>

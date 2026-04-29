@@ -80,7 +80,7 @@
       <div class="max-w-full md:max-w-3xl mx-auto flex flex-col gap-6 md:gap-10" cdkDropList
         [cdkDropListData]="formSections" (cdkDropListDropped)="onSectionDrop($event)">
 
-        <div class="header-container bg-surface p-4 border-b overflow-hidden flex flex-col">
+        <div class="header-container bg-surface p-4 border-b overflow-y-auto flex flex-col">
           <div class="flex justify-between">
             <input [(ngModel)]="formTitle"
               class="text-3xl font-bold border-none  focus:ring-0 text-primary outline-none" placeholder="Form Title">

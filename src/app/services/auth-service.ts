@@ -115,8 +115,18 @@ export class AuthService {
     );
   }
 
-  googleLogin() {
-    window.location.assign(`${this.oAuthurl}/google`);
+  googleLogin(returnUrl?: string) {
+    const params = new URLSearchParams(window.location.search);
+    let targetUrl = returnUrl || params.get('returnUrl');
+
+    if (!targetUrl) {
+      targetUrl = window.location.pathname;
+    }
+
+    sessionStorage.setItem('oauthReturnUrl', targetUrl);
+
+    const state = btoa(targetUrl);
+    window.location.assign(`${this.oAuthurl}/google?state=${state}`);
   }
 
   handleOAuthCallback(): void {
@@ -124,16 +134,21 @@ export class AuthService {
 
     const accessToken = params.get('accessToken');
     const refreshToken = params.get('refreshToken');
+    const redirectFromBackend = params.get('redirect');
+    const redirectFromSession = sessionStorage.getItem('oauthReturnUrl');
+    const redirect = redirectFromSession || redirectFromBackend || '/home';
 
     if (accessToken) {
       this.setTokens(accessToken, refreshToken || undefined);
       this.isLoggedIn.set(true);
 
-      // ✅ Clean URL (important)
-      window.history.replaceState({}, document.title, '/home');
+      sessionStorage.removeItem('oauthReturnUrl');
 
-      // ✅ Redirect
-      this.router.navigate(['/home']);
+      // clean URL
+      window.history.replaceState({}, document.title, '/');
+
+      // redirect to original page
+      this.router.navigateByUrl(redirect);
     }
   }
 
@@ -150,7 +165,7 @@ export class AuthService {
     );
   }
 
-  logout() {
+  logout(redirectToLogin: boolean = true) {
     const refreshToken = this.getRefreshToken();
     this.http.post(`${this.baseUrl}/logout`, { refreshToken }).subscribe({
       next: () => {
@@ -161,7 +176,10 @@ export class AuthService {
 
     this.clearTokens();
     this.isLoggedIn.set(false);
-    this.router.navigate(['/login']);
+
+    if (redirectToLogin) {
+      this.router.navigate(['/login']);
+    }
   }
 
   refreshToken(): Observable<any> {
