@@ -181,3 +181,136 @@
 .secondary-btn:hover {
   background: var(--mat-sys-surface-container);
 }
+
+/* ================= MOBILE (TABLETS & BELOW) ================= */
+@media (max-width: 768px) {
+
+  .templates-container {
+    margin: 10px;
+  }
+
+  /* FILTERS */
+  .filters {
+    gap: 8px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 5px;
+  }
+
+  .filters::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .filters button {
+    flex: 0 0 auto;
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  /* GRID */
+  .template-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 cards per row */
+    gap: 12px;
+  }
+
+  /* CARD */
+  .template-card {
+    border-radius: 12px;
+  }
+
+  .card-image img {
+    height: 120px;
+  }
+
+  .card-content {
+    padding: 10px;
+  }
+
+  .card-content h3 {
+    font-size: 14px;
+  }
+
+  .card-content p {
+    font-size: 12px;
+  }
+
+  /* FEATURED CARD */
+  .featured-card {
+    height: auto;
+    padding: 20px;
+    border-radius: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .featured-content {
+    max-width: 100%;
+  }
+
+  .featured-content h1 {
+    font-size: 22px;
+  }
+
+  .featured-content p {
+    font-size: 13px;
+  }
+
+  /* BUTTONS STACK */
+  .actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .primary-btn,
+  .secondary-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+}
+
+
+/* ================= SMALL MOBILE ================= */
+@media (max-width: 480px) {
+
+  .template-grid {
+    grid-template-columns: 1fr; /* 1 card per row */
+  }
+
+  .featured-content h1 {
+    font-size: 18px;
+  }
+
+  .featured-content p {
+    font-size: 12px;
+  }
+
+  .filters button {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .card-image {
+    height: auto;              /* fixed height हटाओ */
+    aspect-ratio: 16 / 9;      /* proper ratio */
+    overflow: hidden;
+  }
+
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;         /* clean crop */
+    display: block;
+  }
+
+}
+
+@media (max-width: 480px) {
+  .card-image {
+    aspect-ratio: 4 / 3;   /* थोड़ा compact */
+  }
+}
