@@ -12,25 +12,25 @@
         <mat-icon class="text-sm">visibility</mat-icon>
       </button>
       @if(mode === 'version') {
-      <button mat-button color="primary" class="btn-primary action-button" (click)="saveVersion(true)">
-        <mat-icon>save</mat-icon>
-        <span class="hidden sm:inline">Publish Version</span>
-      </button>
       <button mat-button color="primary" class="btn-primary action-button" (click)="saveVersion(false)">
         <mat-icon>save</mat-icon>
-        <span>Draft Version</span>
+        <span class="hidden sm:inline">Draft Version</span>
+      </button>
+      <button mat-button color="primary" class="btn-primary action-button" (click)="saveVersion(true)">
+        <mat-icon>rocket</mat-icon>
+        <span class="hidden sm:inline">Publish Version</span>
       </button>
       }
       @else{
-        <div class="flex items-center gap-3">
-      <button mat-button class="btn-primary action-button" matTooltip="Save Draft" (click)="saveForm(false)">
-        <mat-icon>save</mat-icon>
-        <span class="hidden sm:inline">Draft</span>
-      </button>
-      <button mat-button class="btn-primary action-button" matTooltip="Publish form" (click)="saveForm(true)">
-        <mat-icon>rocket</mat-icon>
-        <span class="hidden sm:inline">Publish</span>
-      </button>
+      <div class="flex items-center gap-3">
+        <button mat-button class="btn-primary action-button" matTooltip="Save Draft" (click)="saveForm(false)">
+          <mat-icon>save</mat-icon>
+          <span class="hidden sm:inline">Draft</span>
+        </button>
+        <button mat-button class="btn-primary action-button" matTooltip="Publish form" (click)="saveForm(true)">
+          <mat-icon>rocket</mat-icon>
+          <span class="hidden sm:inline">Publish</span>
+        </button>
       </div>
       }
     </div>
@@ -70,7 +70,8 @@
           </div>
         </div>
       </div>
-      <p class="ml-1 p-3 text-xs text-muted mt-4 italic">Drag and Drop elements directly into any section to add them.</p>
+      <p class="ml-1 p-3 text-xs text-muted mt-4 italic">Drag and Drop elements directly into any section to add them.
+      </p>
     </div>
     <!-- Sidebar -->
 
