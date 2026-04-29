@@ -41,7 +41,7 @@
   </div>
 
   <!-- Search bar -->
-  <div class="flex justify-between items-center mt-10" [class.hidden]="isLoading">
+  <div class="flex flex-col md:flex-row justify-between items-center mt-10" [class.hidden]="isLoading">
     <mat-form-field appearance="outline" class="filter-field">
       <mat-label>Search</mat-label>
       <input matInput [formControl]="searchControl" placeholder="Search responses..." />

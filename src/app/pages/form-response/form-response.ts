@@ -182,14 +182,22 @@ export class FormResponse implements OnInit, AfterViewInit, OnDestroy {
           this.displayedColumns = ['slNo', 'submittedAt', ...schemaKeys];
           this.dataSource.data = [];
         } else {
-          const dynamicKeys = Object.keys(responses[0].response || {});
-          // this.displayedColumns = ['slNo', 'submittedAt', ...dynamicKeys];
-          this.displayedColumns = ['slNo',...(form.settings?.isPrivate ? ['username'] : []), ...(form.settings?.isQuizMode ? ['score'] : []), 'submittedAt',  ...dynamicKeys
-];
+          const dynamicKeys = form.sections
+            .flatMap((s) => s.fields)
+            .sort((a, b) => a.fieldOrder - b.fieldOrder)
+            .map((f) => f.id!)
+            .filter(Boolean);
+          this.displayedColumns = [
+            'slNo',
+            ...(form.settings?.isPrivate ? ['username'] : []),
+            ...(form.settings?.isQuizMode ? ['score'] : []),
+            'submittedAt',
+            ...dynamicKeys,
+          ];
           this.dataSource.data = responses.map((res) => ({
             username: res.username,
             submittedAt: new Date(res.submittedAt),
-              score: res.score,
+            score: res.score,
             ...res.response,
           }));
           this.setupFilter();
@@ -455,6 +463,7 @@ export class FormResponse implements OnInit, AfterViewInit, OnDestroy {
               ? 0
               : Math.round(
                   rawValues
+                    .map((v) => (v != null ? String(v).trim() : v))
                     .filter((v) => v !== null && v !== undefined && v !== '')
                     .reduce((sum, v) => sum + String(v).length, 0) / filled,
                 );
