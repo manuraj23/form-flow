@@ -34,25 +34,25 @@
     <!--sidebar-->
     <div class="sidebar" [class.open]="isSidebarOpen">
       <ul>
-        <li (click)="activesection = 'MyForm'" [class.active]="activesection == 'MyForm'">
+        <li (click)="setSection('MyForm')" [class.active]="activesection == 'MyForm'">
           <mat-icon>folder</mat-icon>
           <span>My Forms</span>
         </li>
-        <li (click)="activesection = 'Templates'" [class.active]="activesection == 'Templates'">
+        <li (click)="setSection('Templates')" [class.active]="activesection == 'Templates'">
           <mat-icon>dashboard</mat-icon>
           <span>Templates</span>
         </li>
-        <li (click)="activesection = 'SharedWithMe'" [class.active]="activesection == 'SharedWithMe'">
+        <li (click)="setSection('SharedWithMe')" [class.active]="activesection == 'SharedWithMe'">
           <mat-icon>inbox</mat-icon>
           <span>My Inbox</span>
         </li>
 
-        <li (click)="activesection = 'ManageGroups'" [class.active]="activesection == 'ManageGroups'">
+        <li (click)="setSection('ManageGroups')" [class.active]="activesection == 'ManageGroups'">
           <mat-icon>people</mat-icon>
           <span>Manage Groups</span>
         </li>
 
-        <li (click)="activesection = 'Trash'" [class.active]="activesection == 'Trash'">
+        <li (click)="setSection('Trash')" [class.active]="activesection == 'Trash'">
           <mat-icon>delete</mat-icon>
           <span>Trash</span>
         </li>

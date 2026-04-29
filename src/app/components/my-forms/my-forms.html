@@ -83,6 +83,7 @@
         <td>
   <div class="response-cell">
     <span>{{ form.totalResponses || 0 }}</span>
+    @if(type == 'myForms'){
     <button
       mat-icon-button
       (click)="seeResponses(form.id)"
@@ -90,6 +91,7 @@
     >
       <mat-icon class="relative top-0.75">list_alt</mat-icon>
     </button>
+  }
   </div>
 </td>
         <td>

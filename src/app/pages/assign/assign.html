@@ -1,5 +1,4 @@
 <div class="assign-page">
-
   <!-- HEADER -->
   <div class="header">
     <div>
@@ -10,17 +9,15 @@
 
   <!-- MAIN GRID -->
   <div class="content">
-
     <!-- LEFT SECTION -->
     <div class="left">
-
       <!-- SELECT FORM -->
       <div class="card">
         <label>SELECTED FORM</label>
         <div class="select-box">
           <mat-icon>description</mat-icon>
           <div class="form-info">
-            <span class="title">{{form?.title}}</span>
+            <span class="title">{{ form?.title }}</span>
             <span class="sub">Created on 4th april 2026</span>
           </div>
         </div>
@@ -35,9 +32,14 @@
         <!-- SEARCH -->
         <div class="search">
           <mat-icon>search</mat-icon>
-          <input type="text" placeholder="Search teams or people..." [(ngModel)]="searchText" (keyup.enter)="search()" />
+          <input
+            type="text"
+            placeholder="Search groups and users by email ..."
+            [(ngModel)]="searchText"
+            (keyup.enter)="search()"
+            matTooltip="Enter the email or group name to assign and press enter"
+          />
         </div>
-
 
         <!-- SEARCH RESULT DROPDOWN -->
         <div *ngIf="searchedUser" class="search-result">
@@ -69,40 +71,45 @@
           </div>
         </div>
 
-
-
         <!-- LIST -->
         <div class="list">
-
           <div class="item" *ngFor="let r of filteredRecipients(); let i = index">
-                <div class="left-info">
-                    <span class="title">{{ r.name }}</span>
-                    <span class="assigned-badge" *ngIf="r.preAssigned">Assigned</span>
-                </div>
-            
-                <div class="right-group">
-                  <mat-checkbox [(ngModel)]="r.selected" (change)="updateSummary()" [disabled]="r.preAssigned"></mat-checkbox>
-  
-                  <select class="role-dropdown" [(ngModel)]="r.role" (change)="updateSummary()" [disabled]="r.preAssigned">
-                    <ng-container *ngIf="isDraftForm()">
-                      <option value="Editor">Editor</option>
-                      <option value="Viewer">Viewer</option>
-                    </ng-container>
-
-                    <ng-container *ngIf="isPublishedForm()">
-                      <option value="Respondent">Respondent</option>
-                      <option value="Viewer">Viewer</option>
-                    </ng-container>
-                  </select>
-                </div>
+            <div class="left-info">
+              <span class="title">{{ r.name }}</span>
+              <span class="assigned-badge" *ngIf="r.preAssigned">Assigned</span>
             </div>
+
+            <div class="right-group">
+              <mat-checkbox
+                [(ngModel)]="r.selected"
+                (change)="updateSummary()"
+                [disabled]="r.preAssigned"
+              ></mat-checkbox>
+
+              <select
+                class="role-dropdown"
+                [(ngModel)]="r.role"
+                (change)="updateSummary()"
+                [disabled]="r.preAssigned"
+              >
+                <ng-container *ngIf="isDraftForm()">
+                  <option value="Editor">Editor</option>
+                  <option value="Viewer">Viewer</option>
+                </ng-container>
+
+                <ng-container *ngIf="isPublishedForm()">
+                  <option value="Respondent">Respondent</option>
+                  <option value="Viewer">Viewer</option>
+                </ng-container>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- RIGHT SECTION -->
     <div class="right">
-
       <!-- DEADLINE -->
       <!-- <div class="card">
         <label>SET DEADLINE</label>
@@ -115,7 +122,9 @@
       <!-- NOTE -->
       <div class="card">
         <label>RECIPIENT NOTE</label>
-        <textarea rows="5" [(ngModel)]="description" placeholder="Add a note for the recipients...">Please fill the form</textarea>
+        <textarea rows="5" [(ngModel)]="description" placeholder="Add a note for the recipients...">
+Please fill the form</textarea
+        >
       </div>
 
       <!-- SUMMARY -->
@@ -124,7 +133,7 @@
 
         <div class="row">
           <span>Selected Form</span>
-          <strong>{{form?.title}}</strong>
+          <strong>{{ form?.title }}</strong>
         </div>
 
         <div class="row">
@@ -153,10 +162,8 @@
           <strong>{{ deadline || 'NA' }}</strong>
         </div> -->
 
-
         <button class="assign-btn" (click)="assignForm()">Assign Form</button>
       </div>
-
     </div>
   </div>
 </div>

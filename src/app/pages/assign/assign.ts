@@ -9,10 +9,11 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormService } from '../../services/form-service';
 import { ToastrService } from 'ngx-toastr';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-assign',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatIconModule, MatCheckboxModule, MatMenuModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatIconModule, MatCheckboxModule, MatMenuModule, MatTooltip],
   templateUrl: './assign.html',
   styleUrl: './assign.css',
 })

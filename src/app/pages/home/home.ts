@@ -21,7 +21,8 @@ import { Templates } from '../../components/templates/templates';
   styleUrl: './home.css',
 })
 export class Home {
-  activesection = 'MyForm';
+  //activesection = 'MyForm';
+  activesection = localStorage.getItem('activeSection') || 'MyForm';
   isSidebarOpen = false;
 
 
@@ -52,7 +53,8 @@ export class Home {
   this.isSidebarOpen = !this.isSidebarOpen;
 }
 
-openDialog(){
-  
+setSection(section: string) {
+  this.activesection = section;
+  localStorage.setItem('activeSection', section);
 }
 }
