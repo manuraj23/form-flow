@@ -42,6 +42,7 @@
       placeholder="Type your message..."
       [(ngModel)]="userMessage"
       (keyup.enter)="sendMessage()"
+      #chatInput (focus)="onFocus()"
     />
 
     <button mat-icon-button (click)="sendMessage()" class="!cursor-pointer">
