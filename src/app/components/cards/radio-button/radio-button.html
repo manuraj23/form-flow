@@ -1,5 +1,5 @@
 <mat-radio-group [formControl]="control">
-  @for (option of fieldConfig?.options; track $index) {
+  @for (option of fieldConfig.options; track $index) {
     <mat-radio-button [value]="option" class="block">
       {{ option }}
     </mat-radio-button>

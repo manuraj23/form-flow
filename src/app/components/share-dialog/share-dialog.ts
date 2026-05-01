@@ -7,7 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-share-dialog',
-  imports: [MatIcon, MatFormField, CommonModule],
+  imports: [MatIcon, CommonModule],
   templateUrl: './share-dialog.html',
   styleUrl: './share-dialog.css',
 })

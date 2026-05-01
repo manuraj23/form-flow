@@ -1,5 +1,5 @@
 import { Component, Input, WritableSignal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatError, MatFormField, MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../services/auth-service';
@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-change-password',
-  imports: [FormsModule, MatFormField,MatFormFieldModule,MatError, MatInputModule, MatIconModule, RouterLink],
+  imports: [FormsModule, MatFormField,MatFormFieldModule,MatError, MatInputModule, MatIconModule],
   templateUrl: './change-password.html',
   styleUrl: './change-password.css',
 })

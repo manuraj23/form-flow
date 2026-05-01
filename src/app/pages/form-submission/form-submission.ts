@@ -7,7 +7,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { InputText } from '../../components/cards/input-text/input-text';
 import { FileUpload } from '../../components/cards/file-upload/file-upload';
 import { CheckBox } from '../../components/cards/check-box/check-box';
@@ -39,8 +39,6 @@ import { MatSpinner } from '@angular/material/progress-spinner';
     FormsModule,
     ReactiveFormsModule,
     MatIconModule,
-    RouterLink,
-    Loader
   ],
   templateUrl: './form-submission.html',
   styleUrl: './form-submission.css',

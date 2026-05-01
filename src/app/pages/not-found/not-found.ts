@@ -8,7 +8,7 @@ import { FileUpload } from '../../components/cards/file-upload/file-upload';
 
 @Component({
   selector: 'app-not-found',
-  imports: [InputText,SelectCard,CheckBox,RadioButton,Textarea,FileUpload],
+  imports: [],
   templateUrl: './not-found.html',
   styleUrl: './not-found.css',
 })

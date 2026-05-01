@@ -4,7 +4,7 @@
     [placeholder]="fieldConfig.placeholder || '--Choose From Below--'"
   >
     <mat-option [value]="null">-- SELECT ONE --</mat-option>
-    @for (option of fieldConfig?.options; track $index) {
+    @for (option of fieldConfig.options; track $index) {
       <mat-option [value]="option">
         {{ option }}
       </mat-option>

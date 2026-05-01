@@ -1,15 +1,14 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { MatError, MatFormField, MatInputModule } from '@angular/material/input';
+import { MatFormField, MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../services/auth-service';
 import { ToastrService } from 'ngx-toastr';
 import { GoogleAuthButton } from "../../components/google-auth-button/google-auth-button";
-import { GithubAuthButton } from "../../components/github-auth-button/github-auth-button";
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, MatFormField, MatInputModule, MatError, RouterLink, GoogleAuthButton, GithubAuthButton],
+  imports: [FormsModule, MatFormField, MatInputModule, RouterLink, GoogleAuthButton],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })

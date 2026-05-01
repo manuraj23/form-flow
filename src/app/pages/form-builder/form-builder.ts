@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Component, HostListener } from '@angular/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { EditField } from '../edit-field/edit-field';
 import { FormsModule } from '@angular/forms';
 import { MatMenuModule } from '@angular/material/menu';
@@ -32,8 +32,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 @Component({
   selector: 'app-form-builder',
   imports: [
-    RouterLink,
-    RouterOutlet,
+    
     MatIconModule,
     MatCheckboxModule,
     CommonModule,

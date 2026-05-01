@@ -1,7 +1,7 @@
 <div class="flex flex-col">
-  @for (option of fieldConfig?.options; track $index) {
+  @for (option of fieldConfig.options; track $index) {
     <mat-checkbox
-      [checked]="control?.value?.includes(option)"
+      [checked]="control.value?.includes(option)"
       (change)="onChange(option, $event.checked)"
     >
       {{ option }}

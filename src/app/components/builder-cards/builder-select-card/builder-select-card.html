@@ -1,10 +1,10 @@
-@if (fieldData?.quizConfig?.isScored) {
+@if (fieldData.quizConfig?.isScored) {
 <div
   class="absolute -top-3 right-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-600 text-white shadow-md z-10">
   <span class="text-[10px] font-bold uppercase tracking-tighter">
-    {{ fieldData?.quizConfig?.points }} PTS
+    {{ fieldData.quizConfig?.points }} PTS
     @if (fieldData.quizConfig?.negativeMarks && fieldData.quizConfig!.negativeMarks > 0) {
-    <span class="text-red-200 ml-1">(-{{ fieldData?.quizConfig?.negativeMarks }})</span>
+    <span class="text-red-200 ml-1">(-{{ fieldData.quizConfig?.negativeMarks }})</span>
     }
   </span>
 </div>
@@ -23,18 +23,18 @@
   <div class="flex flex-col gap-2">
     @for (option of fieldData.options; let i = $index; track i) {
   <div class="flex items-center gap-3 group p-2 rounded-xl transition-all duration-300"
-    [class.bg-green-50]="fieldData.quizConfig?.correctAnswer === fieldData?.options?.[i]"
-    [class.border]="fieldData.quizConfig?.correctAnswer === fieldData?.options?.[i]"
-    [class.border-green-200]="fieldData.quizConfig?.correctAnswer === fieldData?.options?.[i]">
+    [class.bg-green-50]="fieldData.quizConfig?.correctAnswer === fieldData.options?.[i]"
+    [class.border]="fieldData.quizConfig?.correctAnswer === fieldData.options?.[i]"
+    [class.border-green-200]="fieldData.quizConfig?.correctAnswer === fieldData.options?.[i]">
 
-    @if (fieldData?.quizConfig?.correctAnswer === fieldData?.options?.[i]) {
+    @if (fieldData.quizConfig?.correctAnswer === fieldData.options?.[i]) {
     <mat-icon class="text-green-600 scale-90">check_circle</mat-icon>
     }
 
     <input [(ngModel)]="fieldData.options![i]"
       class="border-b border-transparent focus:border-theme outline-none text-sm w-full bg-transparent"
-      [class.font-bold]="fieldData.quizConfig?.correctAnswer === fieldData?.options?.[i]"
-      [class.text-green-700]="fieldData.quizConfig?.correctAnswer === fieldData?.options?.[i]"
+      [class.font-bold]="fieldData.quizConfig?.correctAnswer === fieldData.options?.[i]"
+      [class.text-green-700]="fieldData.quizConfig?.correctAnswer === fieldData.options?.[i]"
       placeholder="Option label" />
 
     @if (fieldData.options!.length > 1) {

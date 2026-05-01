@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MyForms } from '../../components/my-forms/my-forms';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ThemeSelector } from '../../components/theme-selector/theme-selector';
 import { ThemeService } from '../../services/theme-service';
 import { MatMenuModule } from '@angular/material/menu';
@@ -16,7 +16,7 @@ import { Templates } from '../../components/templates/templates';
 
 @Component({
   selector: 'app-home',
-  imports: [MatIconModule, CommonModule, MyForms, RouterLink, RouterOutlet, ThemeSelector, MatMenuModule, MatButtonModule, SharedWithMe, GenerateForm, Groups, Templates],
+  imports: [MatIconModule, CommonModule, MyForms, RouterLink, ThemeSelector, MatMenuModule, MatButtonModule, SharedWithMe, GenerateForm, Groups, Templates],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
